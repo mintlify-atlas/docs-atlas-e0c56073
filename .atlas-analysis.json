@@ -1,0 +1,86 @@
+{
+  "projectType": "general",
+  "projectName": "Space Birds",
+  "projectDescription": "An arcade-style space shooter game built with libGDX where birds defend against falling pig obstacles.",
+  "theme": "almond",
+  "primaryColor": "#E74C3C",
+  "lightColor": "#F39C12",
+  "darkColor": "#C0392B",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Game Guide",
+            "pages": [
+              "guide/how-to-play",
+              "guide/controls",
+              "guide/scoring",
+              "guide/game-states"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "development/building",
+              "development/architecture",
+              "development/platforms",
+              "development/assets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Core Classes",
+            "pages": [
+              "api/space-escape",
+              "api/game-state"
+            ]
+          },
+          {
+            "group": "Game Objects",
+            "pages": [
+              "api/player",
+              "api/bullet",
+              "api/obstacle"
+            ]
+          },
+          {
+            "group": "Screens",
+            "pages": [
+              "api/score-screen"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Multi-platform support (Android and Desktop)",
+    "Angry Birds themed graphics and audio",
+    "Collision detection and scoring system",
+    "Touch and keyboard controls",
+    "Three distinct game states with music transitions",
+    "Shooting mechanics with cooldown system"
+  ],
+  "publicApiSurface": [
+    "SpaceEscape - Main game class extending libGDX Game",
+    "GameState - Enum with MENU, PLAYING, GAME_OVER states",
+    "Player - Controllable player with movement and shooting",
+    "Bullet - Projectile fired by player",
+    "Obstacle - Falling enemy objects",
+    "ScoreScreen - Score display screen"
+  ]
+}
