@@ -1,0 +1,197 @@
+---
+title: Building the Game
+description: Learn how to build Space Birds for desktop and Android platforms
+---
+
+Space Birds uses Gradle as its build system. The project includes Gradle wrapper scripts, so you don't need to install Gradle separately.
+
+## Prerequisites
+
+- **JDK 8 or higher** - Required for all platforms
+- **Android SDK** - Required for Android builds (compile SDK 35, min SDK 21)
+
+## Build Commands
+
+### Desktop (LWJGL3)
+
+The desktop platform uses LWJGL3 as the backend.
+
+<CodeGroup>
+
+```bash Windows
+.\gradlew lwjgl3:run
+```
+
+```bash Linux/macOS
+./gradlew lwjgl3:run
+```
+
+</CodeGroup>
+
+This command runs the game directly without creating a JAR file.
+
+### Building Runnable JARs
+
+Create a runnable JAR file that includes all dependencies:
+
+<CodeGroup>
+
+```bash Cross-platform JAR
+./gradlew lwjgl3:jar
+```
+
+```bash Windows-only JAR
+./gradlew jarWin
+```
+
+```bash Linux-only JAR
+./gradlew jarLinux
+```
+
+```bash macOS-only JAR
+./gradlew jarMac
+```
+
+</CodeGroup>
+
+<Info>
+The cross-platform JAR is about 6-7MB larger than platform-specific JARs. Use platform-specific builds for distribution to reduce file size.
+</Info>
+
+**Output location:** `lwjgl3/build/libs/SpaceEscape_AULA-{version}.jar`
+
+**Run the JAR:**
+```bash
+java -jar SpaceEscape_AULA-{version}.jar
+```
+
+### Android
+
+Build an APK for Android devices:
+
+<CodeGroup>
+
+```bash Debug APK
+./gradlew android:assembleDebug
+```
+
+```bash Release APK
+./gradlew android:assembleRelease
+```
+
+</CodeGroup>
+
+**Output location:** `android/build/outputs/apk/`
+
+<Warning>
+Release builds require signing configuration. Debug APKs are suitable for testing only.
+</Warning>
+
+## Useful Gradle Tasks
+
+| Task | Description |
+|------|-------------|
+| `build` | Builds sources and archives for all projects |
+| `clean` | Removes build folders with compiled classes |
+| `lwjgl3:run` | Starts the desktop application |
+| `lwjgl3:jar` | Creates a runnable JAR for desktop |
+| `android:assembleDebug` | Builds a debug APK |
+| `test` | Runs unit tests (if any) |
+| `generateAssetList` | Creates assets.txt listing all game assets |
+
+## Gradle Flags
+
+```bash
+./gradlew build --continue     # Continue on errors
+./gradlew build --daemon        # Use Gradle daemon
+./gradlew build --offline       # Use cached dependencies
+./gradlew build --refresh-dependencies  # Force dependency validation
+```
+
+## Project Configuration
+
+**Application ID:** `com.pmm.games`
+
+**Main class:** `com.pmm.games.lwjgl3.Lwjgl3Launcher`
+
+**Version:** Defined in `gradle.properties` as `projectVersion`
+
+**Desktop window:** 640x480 pixels (configurable in `Lwjgl3Launcher.java:31`)
+
+## Build System Details
+
+<Accordion title="Desktop Build Configuration">
+
+The desktop build uses:
+- **Backend:** LWJGL3 (Lightweight Java Game Library 3)
+- **OpenGL:** ANGLE GLES20 emulation for better compatibility
+- **VSync:** Enabled by default
+- **FPS limit:** Monitor refresh rate + 1
+- **Java compatibility:** Source and target version 8
+
+The JAR task creates a fat JAR with all dependencies included, making it easy to distribute.
+
+</Accordion>
+
+<Accordion title="Android Build Configuration">
+
+The Android build uses:
+- **Compile SDK:** 35
+- **Target SDK:** 35
+- **Minimum SDK:** 21 (Android 5.0 Lollipop)
+- **ABIs supported:** arm64-v8a, armeabi-v7a, x86, x86_64
+- **ProGuard:** Enabled for release builds (code minification)
+- **Immersive mode:** Enabled for fullscreen experience
+
+Native libraries are automatically extracted and packaged via the `copyAndroidNatives` task.
+
+</Accordion>
+
+## Asset Generation
+
+The build automatically generates an `assets.txt` file listing all game assets during the `processResources` phase:
+
+```bash
+./gradlew generateAssetList
+```
+
+This creates a manifest of all files in the `assets/` directory.
+
+## Troubleshooting
+
+<AccordionGroup>
+
+<Accordion title="Build fails with 'Java version' error">
+
+Ensure you're using JDK 8 or higher:
+
+```bash
+java -version
+```
+
+Set `JAVA_HOME` to point to a valid JDK installation.
+
+</Accordion>
+
+<Accordion title="Android build fails">
+
+Check that Android SDK is properly configured:
+
+1. Create `local.properties` in the project root
+2. Add: `sdk.dir=/path/to/android/sdk`
+
+Alternatively, set the `ANDROID_SDK_ROOT` environment variable.
+
+</Accordion>
+
+<Accordion title="Out of memory during build">
+
+Increase Gradle heap size in `gradle.properties`:
+
+```properties
+org.gradle.jvmargs=-Xmx2048m
+```
+
+</Accordion>
+
+</AccordionGroup>

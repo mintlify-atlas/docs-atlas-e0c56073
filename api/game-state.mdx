@@ -1,0 +1,308 @@
+---
+title: GameState
+description: Enum representing the different states of the Space Birds game
+---
+
+## Overview
+
+`GameState` is an enumeration that represents the different states of the game. Each state defines a specific phase in the game flow, controlling what is displayed on screen and how user input is handled.
+
+## Enum Declaration
+
+```java
+public enum GameState
+```
+
+**Package:** `com.pmm.games`
+
+**Author:** juegos
+
+## Values
+
+### MENU
+
+```java
+MENU
+```
+
+Main menu state. The player can start a new game from this state.
+
+**Characteristics:**
+- Displays the game logo at full screen
+- Shows game instructions and controls
+- Plays Angry Birds theme music on loop
+- Waits for player input to transition to PLAYING state
+
+**User Actions:**
+- Touch screen anywhere → Start game
+- Press SPACE or ENTER → Start game
+
+**Visual Elements:**
+- Game logo background
+- Instructions text: "Pulsa ESPACIO o ENTER para comenzar"
+- Controls guide: "Controles: FLECHAS para mover, ESPACIO para disparar"
+- Score viewing hint: "ENTER para ver puntuación durante el juego"
+
+### PLAYING
+
+```java
+PLAYING
+```
+
+Active game state. The player controls the bird, shoots projectiles, and avoids obstacles.
+
+**Characteristics:**
+- Night sky background is rendered
+- Player (red bird) is active and controllable
+- Obstacles (pigs) spawn every 0.5 seconds and fall from the top
+- Bullets can be fired to destroy obstacles
+- Score is calculated in real-time
+- Collision detection is active
+- Battle music plays on loop
+
+**User Actions:**
+- Arrow keys → Move player (UP, DOWN, LEFT, RIGHT)
+- Touch screen → Move player towards touch position
+- SPACE or right mouse button → Shoot bullet
+- ENTER → Show score screen (game continues in background)
+- ESCAPE → End game (transition to GAME_OVER)
+
+**Visual Elements:**
+- Night background (`noche.jpg`)
+- Player sprite and bullets
+- Falling obstacle sprites (pigs)
+- Real-time score display (top-right)
+- Time counter (seconds)
+- Asteroids destroyed counter
+- Current points: `time + (asteroids × 10)`
+- Status text: "Jugando..." (centered)
+- Flash effect on shooting
+
+**Game Logic:**
+- Obstacles spawn every 0.5 seconds at random X positions
+- Player-obstacle collision → Immediate GAME_OVER
+- Bullet-obstacle collision → Obstacle destroyed, +1 to counter, explosion sound
+- Score formula: `1 point per second + 10 points per pig destroyed`
+
+### GAME_OVER
+
+```java
+GAME_OVER
+```
+
+Game finished state. Displays the final score and options to return to the menu.
+
+**Characteristics:**
+- Red screen background
+- Final score is calculated and displayed
+- Game music stops
+- All game objects remain in memory but are no longer updated
+- Waits for player input to return to menu
+
+**User Actions:**
+- Press ENTER → Return to MENU state
+
+**Visual Elements:**
+- Red background (full screen)
+- "GAME OVER" title (yellow, centered)
+- Final score: "Puntuación final: {score}" (yellow)
+- Instructions: "Pulsa ENTER para volver al menú" (yellow)
+
+**Transition Cleanup:**
+When transitioning back to MENU:
+- All obstacles are cleared from the array
+- Game music is stopped
+- Menu music starts playing
+- Score is reset to 0
+- Asteroids destroyed counter is reset to 0
+- Game time is reset to 0
+- Spawn timer is reset to 0
+
+## State Transitions
+
+The game uses a state machine pattern with explicit state transitions:
+
+```
+MENU
+  ↓ (Touch / SPACE / ENTER)
+PLAYING
+  ↓ (ESCAPE / Player-Obstacle Collision)
+GAME_OVER
+  ↓ (ENTER)
+MENU
+```
+
+### Transition Details
+
+<Card title="MENU → PLAYING" icon="play">
+  **Trigger:** User touches screen or presses SPACE/ENTER
+  
+  **Actions:**
+  - Pause menu music
+  - Play game music
+  - Activate player
+  - Reset game time to 0
+  - Reset spawn timer to 0
+  - Clear all obstacles
+</Card>
+
+<Card title="PLAYING → GAME_OVER" icon="stop">
+  **Trigger:** Player presses ESCAPE or collides with obstacle
+  
+  **Actions:**
+  - Calculate final score: `(int)gameTime + (asteroidsDestroyed × 10)`
+  - Keep all objects in memory
+  - Wait for user input
+</Card>
+
+<Card title="GAME_OVER → MENU" icon="arrow-rotate-left">
+  **Trigger:** User presses ENTER
+  
+  **Actions:**
+  - Stop game music
+  - Play menu music
+  - Clear all obstacles from array
+  - Reset score to 0
+  - Reset asteroidsDestroyed to 0
+  - Reset gameTime to 0
+  - Reset spawnTimer to 0
+  - Show score screen
+  - Set gamePaused to true
+</Card>
+
+## Implementation Example
+
+Here's how `GameState` is used in the `SpaceEscape` class:
+
+```java
+public class SpaceEscape extends Game {
+    private GameState gameState;
+    private GameState nextGameState;
+    private boolean gameStateChanged;
+    
+    @Override
+    public void create() {
+        // Initialize to MENU state
+        gameState = GameState.MENU;
+        gameStateChanged = false;
+    }
+    
+    @Override
+    public void render() {
+        // Handle state transitions
+        if (gameStateChanged) {
+            if (nextGameState == GameState.MENU && 
+                gameState == GameState.GAME_OVER) {
+                // Clean up game state
+                obstacles.clear();
+                backgroundGameMusic.stop();
+                backgroundMenuMusic.play();
+                score = 0;
+                asteroidsDestroyed = 0;
+                gameTime = 0;
+            }
+            
+            if (nextGameState == GameState.PLAYING && 
+                gameState == GameState.MENU) {
+                // Initialize gameplay
+                backgroundMenuMusic.pause();
+                backgroundGameMusic.play();
+                player.activate();
+                gameTime = 0;
+            }
+            
+            gameState = nextGameState;
+            gameStateChanged = false;
+        }
+        
+        // Render based on current state
+        switch (gameState) {
+            case MENU:
+                renderMenu();
+                break;
+            case PLAYING:
+                renderGame();
+                break;
+            case GAME_OVER:
+                renderGameOver();
+                break;
+        }
+    }
+}
+```
+
+## State-Specific Behavior
+
+### Input Handling by State
+
+```java
+private void gestionarInputs() {
+    switch (gameState) {
+        case MENU:
+            if (Gdx.input.isTouched() || 
+                Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                nextGameState = GameState.PLAYING;
+                gameStateChanged = true;
+            }
+            break;
+            
+        case PLAYING:
+            // Handle movement, shooting, pause
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+                nextGameState = GameState.GAME_OVER;
+                gameStateChanged = true;
+            }
+            break;
+            
+        case GAME_OVER:
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                nextGameState = GameState.MENU;
+                gameStateChanged = true;
+            }
+            break;
+    }
+}
+```
+
+### Rendering by State
+
+```java
+private void representacionEstado() {
+    switch (gameState) {
+        case MENU:
+            batch.draw(gameLogo, 0, 0, screenWidth, screenHeight);
+            font.draw(batch, "Pulsa ESPACIO para comenzar", 100, 100);
+            backgroundMenuMusic.play();
+            break;
+            
+        case PLAYING:
+            batch.draw(image, 0, 0, screenWidth, screenHeight);
+            player.render(batch);
+            for (Obstacle obstacle : obstacles) {
+                obstacle.render(batch);
+            }
+            font.draw(batch, "Puntos: " + score, 10, 10);
+            break;
+            
+        case GAME_OVER:
+            ScreenUtils.clear(Color.RED);
+            font.draw(batch, "GAME OVER", screenWidth/2, screenHeight/2);
+            font.draw(batch, "Puntuación: " + score, screenWidth/2, screenHeight/2 - 50);
+            break;
+    }
+}
+```
+
+## Best Practices
+
+<Tip>
+  Always use the state machine pattern with `gameStateChanged` flag to ensure clean transitions and proper resource management between states.
+</Tip>
+
+<Warning>
+  Never directly assign `gameState = newState`. Always use the `nextGameState` and `gameStateChanged` pattern to ensure transition logic executes properly.
+</Warning>
+
+## Related Classes
+
+- [SpaceEscape](/api/space-escape) - Main game class that uses GameState for flow control

@@ -1,0 +1,338 @@
+---
+title: 'Player'
+description: 'The Player class represents the controllable player character in the game'
+---
+
+## Overview
+
+The `Player` class represents the controllable player character in the Space Birds game. The player can move in all directions within screen boundaries, shoot bullets, and collide with obstacles. It maintains a shooting system with cooldown mechanics and manages all active bullets.
+
+## Constructor
+
+Creates a new player instance with the specified properties.
+
+```java
+public Player(Texture texture, float x, float y, float width, float height, float speed)
+```
+
+<ParamField path="texture" type="Texture" required>
+  The graphical texture of the player character
+</ParamField>
+
+<ParamField path="x" type="float" required>
+  Initial horizontal position in pixels
+</ParamField>
+
+<ParamField path="y" type="float" required>
+  Initial vertical position in pixels
+</ParamField>
+
+<ParamField path="width" type="float" required>
+  Visual width of the player in pixels
+</ParamField>
+
+<ParamField path="height" type="float" required>
+  Visual height of the player in pixels
+</ParamField>
+
+<ParamField path="speed" type="float" required>
+  Movement speed in pixels per frame
+</ParamField>
+
+### Example
+
+```java
+Texture playerTexture = new Texture("images/player.png");
+Player player = new Player(playerTexture, 400, 100, 64, 64, 5.0f);
+```
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `x` | `float` | Current horizontal position |
+| `y` | `float` | Current vertical position |
+| `width` | `float` | Visual width of the player |
+| `height` | `float` | Visual height of the player |
+| `speed` | `float` | Movement speed in pixels per frame |
+| `texture` | `Texture` | Graphical texture for rendering |
+| `bounds` | `Rectangle` | Collision rectangle (smaller than visual size for fair gameplay) |
+| `engineSound` | `Sound` | Engine sound effect |
+| `shootSound` | `Sound` | Shooting sound effect |
+| `bulletTexture` | `Texture` | Texture used for bullets |
+| `bullets` | `Array<Bullet>` | Collection of all active bullets |
+| `shootCooldown` | `float` | Time between shots (0.3 seconds) |
+| `shootTimer` | `float` | Current cooldown timer |
+
+## Methods
+
+### render
+
+Draws the player and all active bullets to the screen.
+
+```java
+public void render(SpriteBatch batch)
+```
+
+<ParamField path="batch" type="SpriteBatch" required>
+  The SpriteBatch where the player texture will be rendered
+</ParamField>
+
+**Example:**
+```java
+player.render(batch);
+```
+
+### update
+
+Updates the player's logic and all active bullets. Manages cooldown timer and removes inactive bullets.
+
+```java
+public void update(float deltaTime)
+```
+
+<ParamField path="deltaTime" type="float" required>
+  Time elapsed since the last frame in seconds
+</ParamField>
+
+**Example:**
+```java
+player.update(Gdx.graphics.getDeltaTime());
+```
+
+### shoot
+
+Attempts to fire a new bullet if not in cooldown. Creates a bullet at the player's position, plays shooting sound, and resets the cooldown timer.
+
+```java
+public void shoot()
+```
+
+**Example:**
+```java
+if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+    player.shoot();
+}
+```
+
+### moveLeft
+
+Moves the player left while keeping them within screen boundaries.
+
+```java
+public void moveLeft()
+```
+
+**Example:**
+```java
+if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+    player.moveLeft();
+}
+```
+
+### moveRight
+
+Moves the player right while keeping them within screen boundaries.
+
+```java
+public void moveRight()
+```
+
+**Example:**
+```java
+if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+    player.moveRight();
+}
+```
+
+### moveUp
+
+Moves the player up while keeping them within screen boundaries.
+
+```java
+public void moveUp()
+```
+
+**Example:**
+```java
+if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+    player.moveUp();
+}
+```
+
+### moveDown
+
+Moves the player down while keeping them within screen boundaries.
+
+```java
+public void moveDown()
+```
+
+**Example:**
+```java
+if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+    player.moveDown();
+}
+```
+
+### activate
+
+Activates the player's engine sound. Called when the game begins.
+
+```java
+public void activate()
+```
+
+**Example:**
+```java
+player.activate();
+```
+
+### dispose
+
+Releases all resources associated with the player, including textures, sounds, and all active bullets. Must be called when the player is no longer needed.
+
+```java
+public void dispose()
+```
+
+**Example:**
+```java
+@Override
+public void dispose() {
+    player.dispose();
+}
+```
+
+### Getters
+
+#### getX
+
+Returns the current horizontal position of the player.
+
+```java
+public float getX()
+```
+
+**Returns:** `float` - The X coordinate of the player
+
+#### getY
+
+Returns the current vertical position of the player.
+
+```java
+public float getY()
+```
+
+**Returns:** `float` - The Y coordinate of the player
+
+#### getWidth
+
+Returns the visual width of the player.
+
+```java
+public float getWidth()
+```
+
+**Returns:** `float` - Width in pixels
+
+#### getHeight
+
+Returns the visual height of the player.
+
+```java
+public float getHeight()
+```
+
+**Returns:** `float` - Height in pixels
+
+#### getBounds
+
+Returns the collision rectangle of the player. The rectangle is smaller than the visual size for fairer gameplay.
+
+```java
+public Rectangle getBounds()
+```
+
+**Returns:** `Rectangle` - The collision bounds
+
+**Example:**
+```java
+if (player.getBounds().overlaps(obstacle.getBounds())) {
+    // Handle collision
+}
+```
+
+#### getBullets
+
+Returns all active bullets fired by the player.
+
+```java
+public Array<Bullet> getBullets()
+```
+
+**Returns:** `Array<Bullet>` - Array containing all active bullets
+
+**Example:**
+```java
+for (Bullet bullet : player.getBullets()) {
+    if (bullet.getBounds().overlaps(enemy.getBounds())) {
+        bullet.setActive(false);
+        enemy.destroy();
+    }
+}
+```
+
+## Complete Usage Example
+
+```java
+public class GameScreen implements Screen {
+    private SpriteBatch batch;
+    private Player player;
+    
+    @Override
+    public void show() {
+        batch = new SpriteBatch();
+        Texture playerTexture = new Texture("images/player.png");
+        
+        // Create player at center bottom of screen
+        float x = Gdx.graphics.getWidth() / 2 - 32;
+        float y = 50;
+        player = new Player(playerTexture, x, y, 64, 64, 5.0f);
+        player.activate();
+    }
+    
+    @Override
+    public void render(float delta) {
+        // Handle input
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            player.moveLeft();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            player.moveRight();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            player.moveUp();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            player.moveDown();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            player.shoot();
+        }
+        
+        // Update and render
+        player.update(delta);
+        
+        batch.begin();
+        player.render(batch);
+        batch.end();
+    }
+    
+    @Override
+    public void dispose() {
+        player.dispose();
+        batch.dispose();
+    }
+}
+```

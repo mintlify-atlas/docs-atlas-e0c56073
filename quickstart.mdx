@@ -1,80 +1,304 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start
+description: Get Space Birds running in minutes
 ---
 
-## Get started in three steps
+## Overview
 
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+This guide will help you run Space Birds on your local machine within minutes. Space Birds is built with libGDX and supports both desktop and Android platforms.
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  Make sure you've completed the [Installation](/installation) steps before proceeding.
 </Note>
+
+## Running on Desktop
+
+The fastest way to play Space Birds is using the LWJGL3 desktop backend.
+
+<Steps>
+  <Step title="Navigate to project directory">
+    ```bash
+    cd SpaceEscape_AULA
+    ```
+  </Step>
+  
+  <Step title="Run the desktop version">
+    ```bash
+    ./gradlew lwjgl3:run
+    ```
+    
+    On Windows:
+    ```bash
+    gradlew.bat lwjgl3:run
+    ```
+    
+    The game window will open automatically and start from the assets directory.
+  </Step>
+  
+  <Step title="Start playing">
+    The game will launch in a new window. Use the controls to navigate and play Space Birds.
+  </Step>
+</Steps>
+
+<Note>
+  The `lwjgl3:run` task automatically sets the working directory to the `assets` folder and includes platform-specific JVM arguments (like `-XstartOnFirstThread` on macOS).
+</Note>
+
+### Running from JAR
+
+Alternatively, you can build and run from a JAR file:
+
+<Steps>
+  <Step title="Build the JAR">
+    ```bash
+    ./gradlew lwjgl3:jar
+    ```
+  </Step>
+  
+  <Step title="Run the JAR">
+    ```bash
+    java -jar lwjgl3/build/libs/SpaceEscape_AULA-1.0.0.jar
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  JAR files are portable and can be shared with others who have Java installed. The JAR includes all necessary dependencies.
+</Tip>
+
+## Running on Android
+
+To test Space Birds on an Android device or emulator:
+
+<Steps>
+  <Step title="Set up Android SDK">
+    Ensure your Android SDK is configured:
+    
+    ```bash
+    export ANDROID_SDK_ROOT=/path/to/android-sdk
+    ```
+    
+    Or create `local.properties`:
+    ```properties
+    sdk.dir=/path/to/android-sdk
+    ```
+  </Step>
+  
+  <Step title="Connect device or start emulator">
+    **Physical Device:**
+    - Enable USB debugging on your Android device
+    - Connect via USB
+    - Verify connection: `adb devices`
+    
+    **Emulator:**
+    - Launch an Android emulator from Android Studio
+    - Ensure the emulator is running: `adb devices`
+  </Step>
+  
+  <Step title="Install and run on device">
+    ```bash
+    ./gradlew android:installDebug android:run
+    ```
+    
+    This will:
+    1. Build the debug APK
+    2. Install it on your connected device/emulator
+    3. Launch the game automatically
+  </Step>
+</Steps>
+
+<Warning>
+  The Android device must be running Android 5.0 (API Level 21) or higher.
+</Warning>
+
+### Alternative: Build and Install APK Manually
+
+<Steps>
+  <Step title="Build the APK">
+    ```bash
+    ./gradlew android:assembleDebug
+    ```
+    
+    The APK will be at: `android/build/outputs/apk/debug/android-debug.apk`
+  </Step>
+  
+  <Step title="Install the APK">
+    ```bash
+    adb install android/build/outputs/apk/debug/android-debug.apk
+    ```
+  </Step>
+  
+  <Step title="Launch the game">
+    ```bash
+    adb shell am start -n com.pmm.games/com.pmm.games.android.AndroidLauncher
+    ```
+  </Step>
+</Steps>
+
+## First Gameplay Session
+
+Once Space Birds is running, here's what to expect:
+
+<Steps>
+  <Step title="Game launches">
+    The game window opens displaying the Space Birds interface with the libGDX logo.
+  </Step>
+  
+  <Step title="Main menu">
+    Navigate the main menu to start a new game or adjust settings.
+  </Step>
+  
+  <Step title="Start playing">
+    Begin your space adventure! Control your bird through space, avoiding obstacles and collecting points.
+  </Step>
+</Steps>
+
+## Development Workflow
+
+For rapid development and testing:
+
+### Hot Reload Workflow
+
+<Steps>
+  <Step title="Keep the game running">
+    Start the desktop version:
+    ```bash
+    ./gradlew lwjgl3:run
+    ```
+  </Step>
+  
+  <Step title="Make code changes">
+    Edit your source files in `core/src/` or platform-specific directories.
+  </Step>
+  
+  <Step title="Recompile and restart">
+    Stop the game (Ctrl+C) and run again:
+    ```bash
+    ./gradlew lwjgl3:run
+    ```
+  </Step>
+</Steps>
+
+### Asset Changes
+
+Asset files in the `assets/` directory are automatically picked up:
+
+- Images, sounds, and other resources can be modified while developing
+- The desktop version runs from the assets directory by default
+- No rebuild needed for asset-only changes (just restart the game)
+
+## Platform-Specific Notes
+
+<Tabs>
+  <Tab title="Linux">
+    ### Linux Desktop
+    
+    The game runs on Linux x64, ARM32, and ARM64 architectures:
+    ```bash
+    ./gradlew lwjgl3:run
+    ```
+    
+    Native libraries for all architectures are included in the build.
+  </Tab>
+  
+  <Tab title="macOS">
+    ### macOS Desktop
+    
+    On macOS, the JVM argument `-XstartOnFirstThread` is automatically applied:
+    ```bash
+    ./gradlew lwjgl3:run
+    ```
+    
+    Supports both Intel (x64) and Apple Silicon (ARM64) Macs.
+    
+    <Note>
+      The `lwjgl3:run` task handles macOS-specific configuration automatically.
+    </Note>
+  </Tab>
+  
+  <Tab title="Windows">
+    ### Windows Desktop
+    
+    Use the Windows Gradle wrapper:
+    ```bash
+    gradlew.bat lwjgl3:run
+    ```
+    
+    Or if using Git Bash or WSL:
+    ```bash
+    ./gradlew lwjgl3:run
+    ```
+  </Tab>
+  
+  <Tab title="Android">
+    ### Android
+    
+    **Application ID:** `com.pmm.games`
+    
+    **Supported Architectures:**
+    - ARM64-v8a (64-bit ARM)
+    - ARMv7a (32-bit ARM)
+    - x86 (32-bit Intel/AMD)
+    - x86_64 (64-bit Intel/AMD)
+    
+    The APK includes native libraries for all architectures, automatically extracted during build.
+  </Tab>
+</Tabs>
+
+## Troubleshooting
+
+### Game Won't Start
+
+**Desktop:**
+```bash
+# Ensure Java is installed
+java -version
+
+# Clean and rebuild
+./gradlew clean lwjgl3:run
+```
+
+**Android:**
+```bash
+# Check device connection
+adb devices
+
+# Check logs
+adb logcat | grep pmm.games
+```
+
+### Performance Issues
+
+- **Desktop**: Ensure you have sufficient RAM (1GB+ recommended)
+- **Android**: Test on a device with at least Android 5.0 (API 21)
+- Close other applications to free up resources
+
+### Build Errors
+
+```bash
+# Refresh dependencies
+./gradlew clean build --refresh-dependencies
+
+# Use offline mode if network issues
+./gradlew lwjgl3:run --offline
+```
+
+### macOS: "App is damaged and can't be opened"
+
+If running a built JAR, remove the quarantine attribute:
+```bash
+xattr -cr SpaceEscape_AULA-1.0.0.jar
+```
+
+## Next Steps
+
+Now that Space Birds is running:
+
+- Explore the game mechanics and controls
+- Review the source code in `core/src/` to understand the architecture
+- Check out the [Architecture Guide](/development/architecture) to learn about the project structure
+- Start customizing the game with your own assets and logic
+
+<Tip>
+  For continuous development, keep `./gradlew lwjgl3:run` running and make changes to see them in action quickly.
+</Tip>

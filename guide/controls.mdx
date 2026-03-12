@@ -1,0 +1,173 @@
+---
+title: 'Controls'
+description: 'Complete control reference for all platforms'
+icon: 'keyboard'
+---
+
+## Keyboard Controls
+
+Space Birds supports full keyboard control for desktop players. All controls are responsive and allow smooth gameplay.
+
+### Movement Controls
+
+| Key | Action |
+|-----|--------|
+| ← (Left Arrow) | Move bird left |
+| → (Right Arrow) | Move bird right |
+| ↑ (Up Arrow) | Move bird up |
+| ↓ (Down Arrow) | Move bird down |
+
+<Note>
+Movement is continuous while the key is held. The bird stays within screen boundaries automatically.
+</Note>
+
+### Action Controls
+
+| Key | Action | State |
+|-----|--------|-------|
+| SPACE | Shoot bullet | PLAYING, MENU |
+| ENTER | Start game / View score | MENU, PLAYING, GAME_OVER |
+| ESC | End game early | PLAYING |
+
+<Tip>
+Press ENTER during gameplay to view your current score without ending the game!
+</Tip>
+
+## Touch Controls (Mobile)
+
+The game features intuitive touch controls optimized for mobile devices.
+
+### Touch Movement
+
+<Card title="Directional Touch System" icon="hand-pointer">
+  Touch anywhere on the screen and the bird will move toward your finger position.
+</Card>
+
+#### How It Works
+
+1. **Touch the Screen**: Place your finger anywhere
+2. **Bird Follows**: The bird moves toward your touch position
+3. **Dead Zone**: A 5-pixel dead zone prevents micro-movements
+4. **Continuous Tracking**: Keep your finger down for continuous movement
+
+### Touch Direction Logic
+
+```
+Horizontal Movement:
+- Touch more than 5 pixels to the right → Bird moves right
+- Touch more than 5 pixels to the left → Bird moves left
+
+Vertical Movement:
+- Touch more than 5 pixels above bird → Bird moves up  
+- Touch more than 5 pixels below bird → Bird moves down
+```
+
+<Info>
+The dead zone of 5 pixels prevents accidental movements when you're trying to hold position.
+</Info>
+
+### Touch Actions in Different States
+
+| State | Touch Action |
+|-------|-------------|
+| MENU | Tap anywhere to start game |
+| PLAYING | Touch and drag to move bird |
+| GAME_OVER | No touch action (use ENTER key) |
+
+<Warning>
+Touch controls do NOT trigger shooting. You must use keyboard SPACE or mouse right-click to fire.
+</Warning>
+
+## Mouse Controls
+
+Mouse controls provide an alternative shooting method for desktop players.
+
+### Mouse Actions
+
+| Button | Action | State |
+|--------|--------|-------|
+| Right Click | Shoot bullet | PLAYING |
+
+<Card title="Hybrid Control Scheme" icon="mouse">
+  Many players prefer using arrow keys for movement and right-click for shooting, as it allows for more precise control.
+</Card>
+
+### Mouse Shooting Features
+- Same 0.3-second cooldown as keyboard shooting
+- Produces visual flash effect
+- Plays shooting sound effect
+- Fires bullet from bird's center position
+
+## Control Tips
+
+<CardGroup cols={2}>
+  <Card title="Desktop Players" icon="desktop">
+    Use arrow keys for movement and SPACE or right-click for shooting. Try both shooting methods to find your preference!
+  </Card>
+  
+  <Card title="Mobile Players" icon="mobile">
+    Use touch to move your bird around, but remember you'll need to connect a keyboard or use an external input method to shoot.
+  </Card>
+</CardGroup>
+
+<Tip>
+For best performance on desktop, use keyboard for movement and mouse right-click for shooting. This gives you independent control over both actions.
+</Tip>
+
+## Menu Navigation
+
+### Starting the Game
+
+From the MENU state, you have multiple options:
+
+| Input | Action |
+|-------|--------|
+| SPACE key | Start game |
+| ENTER key | Start game |
+| Touch screen | Start game |
+
+### In-Game Controls
+
+| Input | Action | Result |
+|-------|--------|--------|
+| ESC | Quit to game over | Shows final score |
+| ENTER | View current score | Temporary score overlay |
+| Arrow Keys | Movement | Continuous while held |
+| SPACE / Right Click | Shoot | 0.3s cooldown |
+
+### Game Over Screen
+
+| Input | Action |
+|-------|--------|
+| ENTER | Return to menu |
+
+<Note>
+The game over screen only responds to the ENTER key. Touch and other inputs are disabled in this state.
+</Note>
+
+## Movement Boundaries
+
+The bird automatically stays within screen boundaries:
+
+- **Left Boundary**: 0 pixels (left edge)
+- **Right Boundary**: Screen width - 64 pixels (bird width)
+- **Bottom Boundary**: 0 pixels (bottom edge)  
+- **Top Boundary**: Screen height - 64 pixels (bird height)
+
+<Info>
+You can safely hold movement keys without worrying about going off-screen. The game prevents out-of-bounds movement automatically.
+</Info>
+
+## Accessibility
+
+### Multiple Input Methods
+
+The game supports multiple control schemes simultaneously:
+
+✅ **Keyboard-only gameplay** (arrows + space)  
+✅ **Hybrid keyboard + mouse** (arrows + right-click)  
+✅ **Touch + keyboard** (touch movement + space to shoot)  
+
+<Tip>
+Experiment with different control combinations to find what works best for your play style!
+</Tip>

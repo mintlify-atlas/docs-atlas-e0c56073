@@ -1,0 +1,103 @@
+---
+title: 'How to Play'
+description: 'Learn the basics of Space Birds and master the gameplay'
+icon: 'gamepad'
+---
+
+## Game Objective
+
+Space Birds is an exciting action game where you control a brave red bird defending against waves of incoming pigs. Your mission is to survive as long as possible while shooting down as many pigs as you can to maximize your score.
+
+<Info>
+The game combines survival and skill - the longer you last and the more enemies you destroy, the higher your score!
+</Info>
+
+## Player Character
+
+<Card title="The Red Bird" icon="bird">
+  You control a red Angry Bird that can move freely across the screen. The bird is equipped with a powerful shooting ability to take down the pig enemies.
+</Card>
+
+### Bird Characteristics
+- **Size**: 64x64 pixels
+- **Movement Speed**: 5 pixels per frame
+- **Starting Position**: Center-bottom of the screen
+- **Hitbox**: Slightly smaller than visual size (75% of actual size) for fair gameplay
+- **Shooting Cooldown**: 0.3 seconds between shots
+
+## Enemies (Pigs)
+
+<Warning>
+Pigs spawn from the top of the screen every 0.5 seconds and fall downward. If a pig collides with your bird, it's game over!
+</Warning>
+
+### Pig Properties
+- **Size**: 62x48 pixels
+- **Spawn Location**: Random horizontal position at the top of the screen
+- **Movement**: Falls downward at 3 pixels per frame
+- **Spawn Rate**: One pig every 0.5 seconds
+- **Threat Level**: Instant game over on collision
+
+## Shooting Mechanics
+
+### How Shooting Works
+
+1. **Fire a Bullet**: Press SPACE, tap the screen, or right-click to shoot
+2. **Bullet Travel**: Bullets move upward at 10 pixels per frame
+3. **Hit Detection**: When a bullet overlaps with a pig, both are destroyed
+4. **Cooldown**: You must wait 0.3 seconds between shots
+
+<Tip>
+Time your shots carefully! The cooldown means you can't spam bullets, so aim strategically.
+</Tip>
+
+### Bullet Specifications
+- **Size**: 10x20 pixels (red projectile)
+- **Speed**: 10 pixels per frame (upward)
+- **Lifespan**: Automatically removed when off-screen
+- **Sound Effect**: "Piuw" sound plays on each shot
+
+### Visual Feedback
+When you shoot, the screen briefly flashes white for 0.1 seconds to give satisfying visual feedback.
+
+## Survival Tips
+
+<CardGroup cols={2}>
+  <Card title="Keep Moving" icon="arrows">
+    Stay mobile and position yourself where you can avoid incoming pigs while having clear shots.
+  </Card>
+  
+  <Card title="Shoot Early" icon="crosshairs">
+    Don't wait until pigs are close. Shoot them as soon as they spawn for maximum safety.
+  </Card>
+  
+  <Card title="Watch the Pattern" icon="eye">
+    Pigs spawn randomly but consistently every 0.5 seconds. Anticipate where they'll appear.
+  </Card>
+  
+  <Card title="Mind the Cooldown" icon="clock">
+    Remember the 0.3-second cooldown between shots. Don't miss, or you'll be vulnerable!
+  </Card>
+</CardGroup>
+
+<Note>
+The game gets progressively harder as more pigs accumulate on screen. Clear them quickly to maintain control!
+</Note>
+
+## Collision Detection
+
+When your bird's hitbox overlaps with a pig's hitbox, the game immediately transitions to GAME_OVER state. Your final score is calculated based on:
+- Time survived (1 point per second)
+- Pigs destroyed (10 points each)
+
+## Audio Experience
+
+### In-Game Sounds
+- **Background Music**: Epic battle theme (battle.mp3)
+- **Shooting Sound**: Projectile launch effect (piuw.mp3)
+- **Explosion Sound**: Pig destruction sound (muerteCerdo.mp3) at 70% volume
+- **Engine Sound**: Tension drone ambiance when player is active
+
+<Tip>
+Listen for the explosion sound to confirm successful hits, especially during intense gameplay!
+</Tip>

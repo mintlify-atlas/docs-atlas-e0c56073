@@ -1,0 +1,285 @@
+---
+title: 'Obstacle'
+description: 'The Obstacle class represents falling pig enemies in the game'
+---
+
+## Overview
+
+The `Obstacle` class represents an obstacle (asteroid/pig) in the Space Birds game. Obstacles move downward from the top of the screen and can be destroyed by the player's bullets. Each obstacle has a collision rectangle that is smaller than its visual size to provide fairer collision detection for the player.
+
+## Constructor
+
+Creates a new obstacle instance with the specified properties.
+
+```java
+public Obstacle(Texture texture, float x, float y, float width, float height, float speed)
+```
+
+<ParamField path="texture" type="Texture" required>
+  The graphical texture of the obstacle
+</ParamField>
+
+<ParamField path="x" type="float" required>
+  Initial horizontal position in pixels
+</ParamField>
+
+<ParamField path="y" type="float" required>
+  Initial vertical position in pixels (should be above the screen)
+</ParamField>
+
+<ParamField path="width" type="float" required>
+  Visual width of the obstacle in pixels
+</ParamField>
+
+<ParamField path="height" type="float" required>
+  Visual height of the obstacle in pixels
+</ParamField>
+
+<ParamField path="speed" type="float" required>
+  Movement speed in pixels per frame (positive value moves downward)
+</ParamField>
+
+### Example
+
+```java
+Texture obstacleTexture = new Texture("images/obstacle.png");
+float x = MathUtils.random(0, Gdx.graphics.getWidth() - 64);
+float y = Gdx.graphics.getHeight() + 10; // Start above screen
+Obstacle obstacle = new Obstacle(obstacleTexture, x, y, 64, 64, 3.0f);
+```
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `x` | `float` | Current horizontal position |
+| `y` | `float` | Current vertical position |
+| `width` | `float` | Visual width of the obstacle |
+| `height` | `float` | Visual height of the obstacle |
+| `speed` | `float` | Movement speed in pixels per frame |
+| `texture` | `Texture` | Graphical texture for rendering |
+| `bounds` | `Rectangle` | Collision rectangle (smaller than visual size for fair gameplay) |
+| `active` | `boolean` | Whether the obstacle is active and should be processed |
+
+## Methods
+
+### render
+
+Draws the obstacle to the screen if it is active.
+
+```java
+public void render(SpriteBatch batch)
+```
+
+<ParamField path="batch" type="SpriteBatch" required>
+  The SpriteBatch where the obstacle texture will be rendered
+</ParamField>
+
+**Example:**
+```java
+for (Obstacle obstacle : obstacles) {
+    obstacle.render(batch);
+}
+```
+
+### update
+
+Updates the obstacle's position. The obstacle moves downward according to its speed, and the collision bounds are updated accordingly.
+
+```java
+public void update()
+```
+
+**Example:**
+```java
+for (int i = obstacles.size - 1; i >= 0; i--) {
+    Obstacle obstacle = obstacles.get(i);
+    obstacle.update();
+    
+    if (obstacle.isOutOfScreen()) {
+        obstacles.removeIndex(i);
+    }
+}
+```
+
+### isOutOfScreen
+
+Checks if the obstacle has exited the screen or has been destroyed.
+
+```java
+public boolean isOutOfScreen()
+```
+
+**Returns:** `boolean` - `true` if the obstacle is below the screen or has been destroyed, `false` otherwise
+
+**Example:**
+```java
+if (obstacle.isOutOfScreen()) {
+    obstacles.remove(obstacle);
+}
+```
+
+### destroy
+
+Marks the obstacle as destroyed. A destroyed obstacle will not be rendered or updated.
+
+```java
+public void destroy()
+```
+
+**Example:**
+```java
+if (bullet.getBounds().overlaps(obstacle.getBounds())) {
+    obstacle.destroy();
+    bullet.setActive(false);
+    score += 10;
+}
+```
+
+### isActive
+
+Checks if the obstacle is active (not destroyed).
+
+```java
+public boolean isActive()
+```
+
+**Returns:** `boolean` - `true` if the obstacle is active, `false` if it has been destroyed
+
+**Example:**
+```java
+if (obstacle.isActive()) {
+    // Check for collisions
+}
+```
+
+### getBounds
+
+Returns the collision rectangle of the obstacle. The collision bounds are smaller than the visual size (reduced by 25% on each side) to provide fairer collision detection.
+
+```java
+public Rectangle getBounds()
+```
+
+**Returns:** `Rectangle` - The collision bounds (smaller than visual size)
+
+**Example:**
+```java
+for (Obstacle obstacle : obstacles) {
+    if (player.getBounds().overlaps(obstacle.getBounds())) {
+        // Handle player collision
+        gameOver();
+    }
+    
+    for (Bullet bullet : bullets) {
+        if (bullet.getBounds().overlaps(obstacle.getBounds())) {
+            obstacle.destroy();
+            bullet.setActive(false);
+            score += 10;
+        }
+    }
+}
+```
+
+## Complete Usage Example
+
+```java
+public class ObstacleManager {
+    private Array<Obstacle> obstacles;
+    private Texture obstacleTexture;
+    private float spawnTimer;
+    private float spawnInterval;
+    
+    public ObstacleManager() {
+        obstacles = new Array<>();
+        obstacleTexture = new Texture("images/obstacle.png");
+        spawnTimer = 0;
+        spawnInterval = 2.0f; // Spawn every 2 seconds
+    }
+    
+    public void update(float deltaTime) {
+        // Update spawn timer
+        spawnTimer += deltaTime;
+        if (spawnTimer >= spawnInterval) {
+            spawnObstacle();
+            spawnTimer = 0;
+        }
+        
+        // Update all obstacles
+        for (int i = obstacles.size - 1; i >= 0; i--) {
+            Obstacle obstacle = obstacles.get(i);
+            obstacle.update();
+            
+            // Remove obstacles that are off screen
+            if (obstacle.isOutOfScreen()) {
+                obstacles.removeIndex(i);
+            }
+        }
+    }
+    
+    private void spawnObstacle() {
+        float width = 64;
+        float x = MathUtils.random(0, Gdx.graphics.getWidth() - width);
+        float y = Gdx.graphics.getHeight() + 10;
+        float speed = MathUtils.random(2.0f, 5.0f);
+        
+        Obstacle obstacle = new Obstacle(obstacleTexture, x, y, width, width, speed);
+        obstacles.add(obstacle);
+    }
+    
+    public void checkCollisions(Player player, Array<Bullet> bullets) {
+        for (Obstacle obstacle : obstacles) {
+            if (!obstacle.isActive()) continue;
+            
+            // Check player collision
+            if (player.getBounds().overlaps(obstacle.getBounds())) {
+                // Handle game over
+                return;
+            }
+            
+            // Check bullet collisions
+            for (Bullet bullet : bullets) {
+                if (bullet.isActive() && 
+                    bullet.getBounds().overlaps(obstacle.getBounds())) {
+                    obstacle.destroy();
+                    bullet.setActive(false);
+                    break;
+                }
+            }
+        }
+    }
+    
+    public void render(SpriteBatch batch) {
+        for (Obstacle obstacle : obstacles) {
+            obstacle.render(batch);
+        }
+    }
+    
+    public void dispose() {
+        obstacleTexture.dispose();
+        obstacles.clear();
+    }
+    
+    public Array<Obstacle> getObstacles() {
+        return obstacles;
+    }
+}
+```
+
+## Collision Bounds
+
+The obstacle's collision rectangle is intentionally smaller than its visual size to provide fairer gameplay:
+
+- **Visual size**: The full `width` and `height` specified in the constructor
+- **Collision size**: Reduced by 25% on each side (12.5% from each edge)
+- **Collision offset**: Positioned at `(x + width/8, y + height/8)`
+
+This means if an obstacle has a visual size of 64x64 pixels, its collision rectangle will be 48x48 pixels, centered within the visual representation.
+
+## Notes
+
+- Obstacles move downward (speed is subtracted from y position)
+- The collision bounds automatically update when the obstacle moves
+- Obstacles should be spawned above the screen (y > screen height) to appear smoothly
+- Use `isOutOfScreen()` to clean up obstacles that have passed the bottom of the screen
+- Unlike bullets, obstacle textures are typically shared and should be disposed by the manager, not individual obstacles

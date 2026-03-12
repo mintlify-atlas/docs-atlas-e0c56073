@@ -1,0 +1,176 @@
+---
+title: 'ScoreScreen'
+description: 'Displays the final game score with UI controls'
+---
+
+## Overview
+
+The `ScoreScreen` class displays the player's final score at the end of a game session. It provides a simple UI overlay with the score and a button to return to the main menu.
+
+**Package:** `com.pmm.games.screens`
+
+**Implements:** `Screen` (libGDX)
+
+## Purpose
+
+This screen serves as the game-over screen, showing players their final score and providing navigation back to the main menu. It uses Scene2D for UI management and creates a semi-transparent overlay to display the score information.
+
+## Constructor
+
+### ScoreScreen
+
+```java
+public ScoreScreen(int score)
+```
+
+Creates a new score screen instance.
+
+**Parameters:**
+- `score` (int) - The final score to display to the player
+
+**Example:**
+```java
+// Create a score screen showing player achieved 1500 points
+ScoreScreen scoreScreen = new ScoreScreen(1500);
+game.setScreen(scoreScreen);
+```
+
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `stage` | Stage | Scene2D stage managing the UI elements |
+| `score` | int | The player's final score |
+| `showScoreScreen` | boolean | Flag indicating whether screen should remain visible |
+| `table` | Table | Main layout table for UI arrangement |
+
+## Methods
+
+### show
+
+```java
+@Override
+public void show()
+```
+
+Initializes and configures the user interface elements. This method:
+- Creates a semi-transparent background (300x150 pixels, yellow tint with 30% opacity)
+- Displays the score with label "Tu puntuación: {score}" at 2x font scale
+- Adds a "MENÚ" button to return to the main menu
+- Loads UI skin from `skins/uiskin.json`
+
+**Called automatically** when the screen becomes active.
+
+### render
+
+```java
+@Override
+public void render(float delta)
+```
+
+Renders the screen each frame.
+
+**Parameters:**
+- `delta` (float) - Time elapsed since last frame in seconds
+
+### resize
+
+```java
+@Override
+public void resize(int width, int height)
+```
+
+Adjusts the UI when window size changes.
+
+**Parameters:**
+- `width` (int) - New window width
+- `height` (int) - New window height
+
+### isShowScoreScreen
+
+```java
+public boolean isShowScoreScreen()
+```
+
+Checks whether the score screen should remain visible.
+
+**Returns:** `true` if screen should continue showing, `false` if it should close (user clicked menu button)
+
+**Example:**
+```java
+// In game render loop
+if (!scoreScreen.isShowScoreScreen()) {
+    game.setScreen(new MainMenuScreen());
+}
+```
+
+### pause / resume / hide
+
+```java
+@Override
+public void pause()
+@Override
+public void resume()
+@Override
+public void hide()
+```
+
+Lifecycle methods with no specific implementation for this screen.
+
+### dispose
+
+```java
+@Override
+public void dispose()
+```
+
+Releases all resources used by the screen, specifically the Scene2D stage.
+
+**Important:** Always call this method when the screen is no longer needed to prevent memory leaks.
+
+## UI Components
+
+The ScoreScreen creates the following UI elements:
+
+1. **Background**: Semi-transparent yellow rectangle (300x150px, 30% opacity)
+2. **Score Label**: Displays "Tu puntuación: {score}" with 2x font scaling
+3. **Menu Button**: "MENÚ" button (100x30px) that sets `showScoreScreen` to false when clicked
+
+## Integration with Game
+
+The ScoreScreen is typically shown when the game ends. The calling code should:
+
+1. Create the ScoreScreen with the final score
+2. Set it as the active screen
+3. Monitor `isShowScoreScreen()` to detect when user wants to return to menu
+4. Dispose the screen when transitioning away
+
+**Example integration:**
+```java
+// In GameScreen when game ends
+int finalScore = player.getScore();
+ScoreScreen scoreScreen = new ScoreScreen(finalScore);
+game.setScreen(scoreScreen);
+
+// In main game loop
+if (game.getScreen() instanceof ScoreScreen) {
+    ScoreScreen current = (ScoreScreen) game.getScreen();
+    if (!current.isShowScoreScreen()) {
+        current.dispose();
+        game.setScreen(new MainMenuScreen());
+    }
+}
+```
+
+## Dependencies
+
+- **libGDX Core**: For Screen interface and graphics
+- **Scene2D**: For UI management (Stage, Table, Label, TextButton)
+- **UI Skin**: Requires `skins/uiskin.json` file in assets
+
+## Notes
+
+- The screen displays text in Spanish ("Tu puntuación", "MENÚ")
+- Uses a semi-transparent overlay that doesn't obscure the underlying game screen
+- Input handling is automatically set to the stage in the constructor
+- The background is created programmatically using Pixmap for flexibility

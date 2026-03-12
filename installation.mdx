@@ -1,0 +1,250 @@
+---
+title: Installation
+description: Install and set up Space Birds on your development machine
+---
+
+## Requirements
+
+Before installing Space Birds, ensure you have the following prerequisites:
+
+### Core Requirements
+
+- **Java Development Kit (JDK) 8 or higher**
+  - The project uses Java source and target compatibility version 8
+  - JDK 9+ is fully supported with release flag set to 8
+
+- **Gradle** (included via wrapper)
+  - The project includes Gradle wrapper scripts (`gradlew` / `gradlew.bat`)
+  - No separate Gradle installation required
+
+### Platform-Specific Requirements
+
+<Tabs>
+  <Tab title="Desktop (Linux/macOS/Windows)">
+    No additional requirements beyond the JDK. The LWJGL3 backend will run on:
+    - Linux (x64, ARM32, ARM64)
+    - macOS (x64, Apple Silicon M1/M2)
+    - Windows (x86, x64)
+  </Tab>
+  
+  <Tab title="Android">
+    - **Android SDK** (API Level 21+)
+    - **Compile SDK Version**: 35
+    - **Target SDK Version**: 35
+    - **Minimum SDK Version**: 21 (Android 5.0 Lollipop)
+    - **Android Gradle Plugin**: 8.6.1
+    - Set `ANDROID_SDK_ROOT` environment variable or create `local.properties` with `sdk.dir`
+  </Tab>
+</Tabs>
+
+## Clone the Repository
+
+<Steps>
+  <Step title="Clone the source code">
+    ```bash
+    git clone <repository-url>
+    cd SpaceEscape_AULA
+    ```
+  </Step>
+  
+  <Step title="Verify project structure">
+    Ensure the following directories exist:
+    ```
+    SpaceEscape_AULA/
+    ├── core/          # Shared game logic
+    ├── lwjgl3/        # Desktop platform
+    ├── android/       # Android platform
+    ├── assets/        # Game assets
+    └── build.gradle   # Root build file
+    ```
+  </Step>
+</Steps>
+
+## Gradle Setup
+
+The project uses Gradle with a wrapper, so no manual Gradle installation is needed.
+
+### Make Gradle Wrapper Executable
+
+On Linux/macOS, make the wrapper script executable:
+
+```bash
+chmod +x gradlew
+```
+
+### Gradle Configuration
+
+The project includes optimized Gradle settings in `gradle.properties`:
+
+- **Daemon**: Disabled by default to conserve RAM
+- **JVM Args**: `-Xms512M -Xmx1G` (512MB initial, 1GB max heap)
+- **Encoding**: UTF-8 for files and console
+- **libGDX Version**: 1.14.0
+
+## Building the Project
+
+### Build All Platforms
+
+To build sources and archives for all platforms:
+
+```bash
+./gradlew build
+```
+
+<Note>
+  The `build` task compiles all subprojects (core, lwjgl3, android) and creates archives.
+</Note>
+
+### Build Desktop JAR
+
+<Steps>
+  <Step title="Build runnable JAR">
+    ```bash
+    ./gradlew lwjgl3:jar
+    ```
+    
+    The JAR will be located at `lwjgl3/build/libs/SpaceEscape_AULA-1.0.0.jar`
+  </Step>
+  
+  <Step title="Build platform-specific JARs (optional)">
+    For smaller file sizes, build platform-specific JARs:
+    
+    <CodeGroup>
+    ```bash macOS
+    ./gradlew jarMac
+    ```
+    
+    ```bash Linux
+    ./gradlew jarLinux
+    ```
+    
+    ```bash Windows
+    ./gradlew jarWin
+    ```
+    </CodeGroup>
+    
+    Platform-specific JARs are 5-7MB smaller than cross-platform builds.
+  </Step>
+</Steps>
+
+### Build Android APK
+
+<Steps>
+  <Step title="Set up Android SDK path">
+    Create `local.properties` in the project root:
+    ```properties
+    sdk.dir=/path/to/android-sdk
+    ```
+    
+    Or set the environment variable:
+    ```bash
+    export ANDROID_SDK_ROOT=/path/to/android-sdk
+    ```
+  </Step>
+  
+  <Step title="Build debug APK">
+    ```bash
+    ./gradlew android:assembleDebug
+    ```
+    
+    The APK will be in `android/build/outputs/apk/debug/`
+  </Step>
+  
+  <Step title="Build release APK">
+    ```bash
+    ./gradlew android:assembleRelease
+    ```
+    
+    <Warning>
+      Release builds have ProGuard minification enabled. Ensure you have signing keys configured.
+    </Warning>
+  </Step>
+</Steps>
+
+## IDE Setup
+
+### IntelliJ IDEA
+
+```bash
+./gradlew idea
+```
+
+This generates IntelliJ project files. Then open the project in IntelliJ IDEA.
+
+<Note>
+  The project is configured to "Build and run using IntelliJ IDEA" (check Settings).
+</Note>
+
+### Eclipse
+
+```bash
+./gradlew eclipse
+```
+
+This generates Eclipse project files. Then import the project into Eclipse.
+
+### Clean IDE Data
+
+To remove generated IDE files:
+
+<CodeGroup>
+```bash IntelliJ
+./gradlew cleanIdea
+```
+
+```bash Eclipse
+./gradlew cleanEclipse
+```
+</CodeGroup>
+
+## Useful Gradle Tasks
+
+Here are commonly used Gradle tasks for Space Birds:
+
+| Task | Description |
+|------|-------------|
+| `./gradlew build` | Builds sources and archives for all platforms |
+| `./gradlew clean` | Removes build folders with compiled classes |
+| `./gradlew lwjgl3:run` | Runs the desktop version |
+| `./gradlew lwjgl3:jar` | Creates runnable JAR at `lwjgl3/build/libs` |
+| `./gradlew android:assembleDebug` | Builds Android debug APK |
+| `./gradlew android:lint` | Performs Android project validation |
+| `./gradlew test` | Runs unit tests |
+
+### Gradle Flags
+
+- `--daemon` - Uses Gradle daemon for faster builds
+- `--offline` - Uses cached dependencies (no network)
+- `--refresh-dependencies` - Forces dependency validation
+- `--continue` - Continues execution after errors
+
+## Troubleshooting
+
+### Gradle Permission Denied
+
+If you get permission errors on Linux/macOS:
+```bash
+chmod +x gradlew
+```
+
+### Android SDK Not Found
+
+Ensure `ANDROID_SDK_ROOT` is set or `local.properties` exists with `sdk.dir`.
+
+### Out of Memory Errors
+
+Increase Gradle heap size in `gradle.properties`:
+```properties
+org.gradle.jvmargs=-Xms512M -Xmx2G
+```
+
+### Build Cache Issues
+
+Clean and rebuild:
+```bash
+./gradlew clean build --refresh-dependencies
+```
+
+## Next Steps
+
+Now that you have Space Birds installed, proceed to the [Quickstart Guide](/quickstart) to run the game.

@@ -1,0 +1,275 @@
+---
+title: 'Bullet'
+description: 'The Bullet class represents projectiles fired by the player'
+---
+
+## Overview
+
+The `Bullet` class represents a projectile fired by the player in the Space Birds game. Bullets move vertically upward and can collide with obstacles. Each bullet has an active state that determines whether it should be rendered and updated. Bullets are automatically deactivated when they leave the screen.
+
+## Constructor
+
+Creates a new bullet instance with the specified properties.
+
+```java
+public Bullet(Texture texture, float x, float y, float width, float height, float speed)
+```
+
+<ParamField path="texture" type="Texture" required>
+  The graphical texture of the bullet
+</ParamField>
+
+<ParamField path="x" type="float" required>
+  Initial horizontal position in pixels
+</ParamField>
+
+<ParamField path="y" type="float" required>
+  Initial vertical position in pixels
+</ParamField>
+
+<ParamField path="width" type="float" required>
+  Width of the bullet in pixels
+</ParamField>
+
+<ParamField path="height" type="float" required>
+  Height of the bullet in pixels
+</ParamField>
+
+<ParamField path="speed" type="float" required>
+  Movement speed in pixels per frame (positive value moves upward)
+</ParamField>
+
+### Example
+
+```java
+Texture bulletTexture = new Texture("images/bullet.png");
+Bullet bullet = new Bullet(bulletTexture, 400, 200, 10, 20, 10.0f);
+```
+
+## Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `x` | `float` | Current horizontal position |
+| `y` | `float` | Current vertical position |
+| `width` | `float` | Width of the bullet |
+| `height` | `float` | Height of the bullet |
+| `speed` | `float` | Movement speed in pixels per frame |
+| `texture` | `Texture` | Graphical texture for rendering |
+| `bounds` | `Rectangle` | Collision rectangle matching the bullet size |
+| `active` | `boolean` | Whether the bullet is active and should be processed |
+
+## Methods
+
+### render
+
+Draws the bullet to the screen if it is active.
+
+```java
+public void render(SpriteBatch batch)
+```
+
+<ParamField path="batch" type="SpriteBatch" required>
+  The SpriteBatch where the bullet texture will be rendered
+</ParamField>
+
+**Example:**
+```java
+for (Bullet bullet : bullets) {
+    bullet.render(batch);
+}
+```
+
+### update
+
+Updates the bullet's position and state. The bullet moves upward according to its speed and is automatically deactivated if it exits the top of the screen.
+
+```java
+public void update()
+```
+
+**Example:**
+```java
+for (int i = bullets.size - 1; i >= 0; i--) {
+    Bullet bullet = bullets.get(i);
+    bullet.update();
+    
+    if (!bullet.isActive()) {
+        bullets.removeIndex(i);
+    }
+}
+```
+
+### isActive
+
+Checks if the bullet is active and should be processed.
+
+```java
+public boolean isActive()
+```
+
+**Returns:** `boolean` - `true` if the bullet is active, `false` otherwise
+
+**Example:**
+```java
+if (bullet.isActive()) {
+    // Process bullet
+}
+```
+
+### setActive
+
+Sets the active state of the bullet. Typically used to deactivate bullets after collision.
+
+```java
+public void setActive(boolean active)
+```
+
+<ParamField path="active" type="boolean" required>
+  The new active state of the bullet
+</ParamField>
+
+**Example:**
+```java
+if (bullet.getBounds().overlaps(obstacle.getBounds())) {
+    bullet.setActive(false);
+    obstacle.destroy();
+}
+```
+
+### getBounds
+
+Returns the collision rectangle of the bullet.
+
+```java
+public Rectangle getBounds()
+```
+
+**Returns:** `Rectangle` - The collision bounds matching the bullet's size
+
+**Example:**
+```java
+for (Bullet bullet : player.getBullets()) {
+    for (Obstacle obstacle : obstacles) {
+        if (bullet.getBounds().overlaps(obstacle.getBounds())) {
+            bullet.setActive(false);
+            obstacle.destroy();
+            score += 10;
+        }
+    }
+}
+```
+
+### Getters
+
+#### getX
+
+Returns the current horizontal position of the bullet.
+
+```java
+public float getX()
+```
+
+**Returns:** `float` - The X coordinate of the bullet
+
+#### getY
+
+Returns the current vertical position of the bullet.
+
+```java
+public float getY()
+```
+
+**Returns:** `float` - The Y coordinate of the bullet
+
+### dispose
+
+Releases the graphical resources associated with the bullet. Must be called when the bullet is no longer needed.
+
+```java
+public void dispose()
+```
+
+**Example:**
+```java
+for (Bullet bullet : bullets) {
+    bullet.dispose();
+}
+bullets.clear();
+```
+
+## Complete Usage Example
+
+```java
+public class GameManager {
+    private Array<Bullet> bullets;
+    private Array<Obstacle> obstacles;
+    private Texture bulletTexture;
+    private int score;
+    
+    public GameManager() {
+        bullets = new Array<>();
+        obstacles = new Array<>();
+        bulletTexture = new Texture("images/bullet.png");
+        score = 0;
+    }
+    
+    public void shoot(float playerX, float playerY, float playerWidth, float playerHeight) {
+        // Create bullet at center of player, above the player
+        float bulletX = playerX + playerWidth / 2 - 5;
+        float bulletY = playerY + playerHeight;
+        float bulletWidth = 10;
+        float bulletHeight = 20;
+        float bulletSpeed = 10f;
+        
+        Bullet newBullet = new Bullet(bulletTexture, bulletX, bulletY,
+            bulletWidth, bulletHeight, bulletSpeed);
+        bullets.add(newBullet);
+    }
+    
+    public void update() {
+        // Update all bullets
+        for (int i = bullets.size - 1; i >= 0; i--) {
+            Bullet bullet = bullets.get(i);
+            bullet.update();
+            
+            // Check collisions with obstacles
+            for (Obstacle obstacle : obstacles) {
+                if (obstacle.isActive() && 
+                    bullet.getBounds().overlaps(obstacle.getBounds())) {
+                    bullet.setActive(false);
+                    obstacle.destroy();
+                    score += 10;
+                    break;
+                }
+            }
+            
+            // Remove inactive bullets
+            if (!bullet.isActive()) {
+                bullets.removeIndex(i);
+            }
+        }
+    }
+    
+    public void render(SpriteBatch batch) {
+        for (Bullet bullet : bullets) {
+            bullet.render(batch);
+        }
+    }
+    
+    public void dispose() {
+        for (Bullet bullet : bullets) {
+            bullet.dispose();
+        }
+        bullets.clear();
+        bulletTexture.dispose();
+    }
+}
+```
+
+## Notes
+
+- Bullets are automatically deactivated when they exit the top of the screen (y > screen height)
+- The collision bounds match exactly the visual size of the bullet
+- Inactive bullets should be removed from collections to prevent memory leaks
+- Each bullet has its own texture reference that must be disposed of properly

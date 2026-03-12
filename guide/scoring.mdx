@@ -1,0 +1,224 @@
+---
+title: 'Scoring System'
+description: 'Understand how points are calculated and maximize your score'
+icon: 'trophy'
+---
+
+## How Scoring Works
+
+Space Birds uses a dual-component scoring system that rewards both survival time and aggressive pig elimination. Your final score is the sum of these two components.
+
+<Card title="Score Formula" icon="calculator">
+  **Total Score = Time Points + Kill Points**
+  
+  - Time Points: 1 point per second survived
+  - Kill Points: 10 points per pig destroyed
+</Card>
+
+## Time-Based Points
+
+### Survival Scoring
+
+Every second you survive in the game adds to your score.
+
+| Time Survived | Points Earned |
+|---------------|---------------|
+| 1 second | 1 point |
+| 10 seconds | 10 points |
+| 30 seconds | 30 points |
+| 60 seconds | 60 points |
+| 120 seconds | 120 points |
+
+<Info>
+The game timer starts as soon as you transition from MENU to PLAYING state and continues until game over.
+</Info>
+
+### Time Tracking
+
+The game displays your current survival time in the top-right corner during gameplay:
+
+```
+Tiempo: 45s
+```
+
+<Note>
+Time points are calculated as an integer, so 45.9 seconds counts as 45 points, not 46.
+</Note>
+
+## Kill-Based Points
+
+### Pig Destruction Bonus
+
+Each pig you destroy with your bullets awards a significant point bonus.
+
+| Action | Points Awarded |
+|--------|----------------|
+| Destroy 1 pig | 10 points |
+| Destroy 5 pigs | 50 points |
+| Destroy 10 pigs | 100 points |
+| Destroy 25 pigs | 250 points |
+| Destroy 50 pigs | 500 points |
+
+<Tip>
+Pig kills are worth 10× more than survival time per second, so aggressive play is rewarded!
+</Tip>
+
+### Kill Counter
+
+The game tracks and displays your pig destruction count:
+
+```
+Asteroides: 23
+```
+
+<Note>
+Despite being called "Asteroides" in the display (from the original space theme), these represent the pigs you've destroyed.
+</Note>
+
+### How Kills Are Registered
+
+A kill is registered when:
+
+1. ✅ Your bullet's hitbox overlaps with a pig's hitbox
+2. ✅ Both the bullet and pig are destroyed
+3. ✅ Explosion sound plays (muerteCerdo.mp3)
+4. ✅ Kill counter increments by 1
+
+## Total Score Calculation
+
+### Real-Time Score Display
+
+During gameplay, your current score is displayed in real-time:
+
+```
+Puntos: 185
+```
+
+This score updates continuously based on:
+- Current survival time (seconds elapsed)
+- Current pig kills (× 10)
+
+### Score Calculation Examples
+
+<CardGroup cols={2}>
+  <Card title="Example 1: Defensive Play" icon="shield">
+    - **Time**: 60 seconds = 60 points
+    - **Kills**: 5 pigs = 50 points
+    - **Total**: 110 points
+  </Card>
+  
+  <Card title="Example 2: Aggressive Play" icon="crosshairs">
+    - **Time**: 45 seconds = 45 points
+    - **Kills**: 30 pigs = 300 points
+    - **Total**: 345 points
+  </Card>
+</CardGroup>
+
+<Card title="Example 3: Master Player" icon="crown">
+  - **Time**: 120 seconds = 120 points
+  - **Kills**: 80 pigs = 800 points
+  - **Total**: 920 points
+</Card>
+
+<Tip>
+Aggressive play generally yields higher scores! A 2-minute survival with 80 kills scores 920 points, while 2 minutes with only 10 kills scores just 220 points.
+</Tip>
+
+## Final Score Display
+
+When the game ends, your final score is calculated and displayed on the GAME_OVER screen:
+
+```
+GAME OVER
+Puntuación final: 345
+Pulsa ENTER para volver al menú
+```
+
+### When Score Is Calculated
+
+Your final score is locked in when:
+
+1. A pig collides with your bird (automatic game over)
+2. You press ESC to quit (manual game over)
+
+<Info>
+If you press ENTER during gameplay to view the score screen, this does NOT end the game. Only collision or ESC triggers final scoring.
+</Info>
+
+## High Score Tips
+
+### Maximize Your Points
+
+<CardGroup cols={2}>
+  <Card title="1. Aggressive Shooting" icon="bullseye">
+    Destroy every pig you can. Each kill is worth 10 seconds of survival time!
+  </Card>
+  
+  <Card title="2. Position Strategically" icon="location-dot">
+    Stay in positions where you can shoot pigs early while maintaining safety.
+  </Card>
+  
+  <Card title="3. Mind the Cooldown" icon="stopwatch">
+    With 0.3s between shots, accuracy matters. Don't waste bullets!
+  </Card>
+  
+  <Card title="4. Clear the Screen" icon="broom">
+    Don't let pigs accumulate. More pigs = higher collision risk = game over.
+  </Card>
+</CardGroup>
+
+### Score Optimization Strategies
+
+<Steps>
+  <Step title="Early Game (0-30s)">
+    Focus on establishing a rhythm. Get 10-15 kills to build a solid point foundation.
+  </Step>
+  
+  <Step title="Mid Game (30-60s)">
+    Maintain aggressive shooting while staying safe. Aim for 30-40 total kills.
+  </Step>
+  
+  <Step title="Late Game (60s+)">
+    Screen density increases. Prioritize clearing close threats while continuing to farm points.
+  </Step>
+</Steps>
+
+## Score Milestones
+
+Challenge yourself to reach these score tiers:
+
+| Tier | Score Range | Description |
+|------|-------------|-------------|
+| 🥉 Bronze | 0-99 | Beginner - Learning the ropes |
+| 🥈 Silver | 100-299 | Intermediate - Getting the hang of it |
+| 🥇 Gold | 300-599 | Advanced - Solid survival and accuracy |
+| 💎 Diamond | 600-999 | Expert - Excellent multitasking |
+| 👑 Master | 1000+ | Elite - Top-tier bird warrior |
+
+<Tip>
+Reaching 1000+ points requires surviving at least 100 seconds (100 points) while destroying 90+ pigs (900 points). Only the most skilled players achieve this!
+</Tip>
+
+## Score Persistence
+
+Currently, the game displays your score on the GAME_OVER screen, but scores are not permanently saved between sessions.
+
+<Note>
+When you return to the MENU from GAME_OVER, all counters reset:
+- Score → 0
+- Asteroids Destroyed → 0  
+- Game Time → 0
+- Spawn Timer → 0
+</Note>
+
+### Score Screen Feature
+
+During gameplay, pressing ENTER shows a detailed score screen overlay without ending the game. This allows you to:
+
+- Check your current progress
+- See your real-time score
+- Resume playing by dismissing the overlay
+
+<Warning>
+The score screen pauses the game music but does NOT pause gameplay. Use this feature strategically!
+</Warning>

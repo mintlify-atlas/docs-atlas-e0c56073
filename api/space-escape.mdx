@@ -1,0 +1,381 @@
+---
+title: SpaceEscape
+description: Main game class for the Space Birds game, extending libGDX's Game class
+---
+
+## Overview
+
+`SpaceEscape` is the main game class that extends libGDX's `Game` class. It manages the complete game lifecycle including rendering, input handling, state transitions, and resource management.
+
+The game features an **Angry Birds adaptation** where players control a red bird that shoots at falling pig enemies. The game includes three main states (MENU, PLAYING, GAME_OVER) and features a complete scoring system based on survival time and enemies destroyed.
+
+## Class Declaration
+
+```java
+public class SpaceEscape extends Game
+```
+
+**Package:** `com.pmm.games`
+
+**Authors:** Adrián Álvarez y Alejandro Medina
+
+**Version:** 1.1 - Edición Angry Birds
+
+## Angry Birds Adaptations
+
+This game is a complete thematic transformation from a space shooter to an Angry Birds-themed game:
+
+### Visual Elements
+- **Player:** Red bird (`red.png`) representing the controllable character
+- **Obstacles:** Pigs (`cerdo.png`) as enemies to destroy
+- **Bullets:** Red projectiles (`bala.jpg`) representing bird attacks
+
+### Audio Theme
+- **Menu Music:** Angry Birds main theme (`angry-birds.mp3`)
+- **Game Music:** Epic battle music (`battle.mp3`)
+- **Sound Effects:**
+  - Shoot: Launch sound (`piuw.mp3`)
+  - Explosion: Pig death sound (`muerteCerdo.mp3`)
+  - Motor: Tension drone sound (`tension-drones.mp3`)
+
+### Game Mechanics
+- Asteroids are now pigs falling from above
+- Player is a bird defending its position
+- Score = survival time + 10 points per pig destroyed
+- Visual effects include shooting flash and adjusted hitboxes
+
+### Cross-Platform Controls
+- **Touch:** Swipe to move
+- **Keyboard:** Arrow keys for movement, SPACE to shoot
+- **Mouse:** Right-click as alternative shooting method
+
+## Key Fields
+
+### Graphics and Rendering
+
+<ParamField path="batch" type="SpriteBatch">
+  Sprite batch for rendering graphics
+</ParamField>
+
+<ParamField path="image" type="Texture">
+  Background texture for the game (`noche.jpg`)
+</ParamField>
+
+<ParamField path="font" type="BitmapFont">
+  Font for rendering text on screen
+</ParamField>
+
+<ParamField path="gameLogo" type="Texture">
+  Game logo for the menu screen (`space.jpg`)
+</ParamField>
+
+<ParamField path="whitePixel" type="Texture">
+  Single white pixel texture for visual effects (flash)
+</ParamField>
+
+### Game State Management
+
+<ParamField path="gameState" type="GameState">
+  Current game state (MENU, PLAYING, or GAME_OVER)
+</ParamField>
+
+<ParamField path="nextGameState" type="GameState">
+  Next game state for transition handling
+</ParamField>
+
+<ParamField path="gameStateChanged" type="boolean">
+  Indicates if the game state has changed and needs processing
+</ParamField>
+
+<ParamField path="gamePaused" type="boolean">
+  Indicates if the game is paused
+</ParamField>
+
+### Game Objects
+
+<ParamField path="player" type="Player">
+  Controllable player instance (the red bird)
+</ParamField>
+
+<ParamField path="obstacles" type="Array<Obstacle>">
+  List of active obstacles (pigs) in the game
+</ParamField>
+
+<ParamField path="obstacleTexture" type="Texture">
+  Texture used for obstacles (`cerdo.png`)
+</ParamField>
+
+<ParamField path="bulletTexture" type="Texture">
+  Texture used for player bullets (`bala.jpg`)
+</ParamField>
+
+### Timing and Scoring
+
+<ParamField path="spawnTimer" type="float">
+  Timer for generating new obstacles (spawns every 0.5 seconds)
+</ParamField>
+
+<ParamField path="gameTime" type="float">
+  Total time elapsed during the current game
+</ParamField>
+
+<ParamField path="score" type="int">
+  Total player score
+</ParamField>
+
+<ParamField path="asteroidsDestroyed" type="int">
+  Counter for asteroids (pigs) destroyed by the player
+</ParamField>
+
+### Audio
+
+<ParamField path="backgroundMenuMusic" type="Music">
+  Background music for the menu screen (Angry Birds theme)
+</ParamField>
+
+<ParamField path="backgroundGameMusic" type="Music">
+  Background music during gameplay (battle music)
+</ParamField>
+
+<ParamField path="explosionSound" type="Sound">
+  Sound effect for pig explosions (`muerteCerdo.mp3`)
+</ParamField>
+
+### Visual Effects
+
+<ParamField path="flashActive" type="boolean">
+  Controls whether the flash effect is active
+</ParamField>
+
+<ParamField path="flashTimer" type="float">
+  Timer for the flash effect duration (0.1 seconds)
+</ParamField>
+
+### Screens
+
+<ParamField path="scoreScreen" type="ScoreScreen">
+  Score screen to display results
+</ParamField>
+
+<ParamField path="showScoreScreen" type="boolean">
+  Indicates if the score screen should be displayed
+</ParamField>
+
+## Methods
+
+### create()
+
+```java
+@Override
+public void create()
+```
+
+Initializes all game resources: textures, sounds, music, and game objects. Sets the initial game state to MENU. This method is called once at application startup.
+
+**Initialization details:**
+- Creates sprite batch for rendering
+- Loads all textures (background, logo, player, obstacles, bullets)
+- Initializes fonts and UI elements
+- Creates player at centered position (x: center, y: 50) with size 64x64 and speed 5f
+- Initializes empty obstacle array
+- Loads Angry Birds theme music for menu (volume 0.5, looping)
+- Loads battle music for gameplay (volume 1.5, looping)
+- Loads pig death sound effect
+- Creates white pixel texture for flash effects
+- Initializes score counters to 0
+
+### render()
+
+```java
+@Override
+public void render()
+```
+
+Main rendering method of the game. Executes every frame. Clears the screen, updates objects, manages input, and renders the current state. Also handles transitions between game states.
+
+**Rendering pipeline:**
+1. Clears screen with dark blue color (0.15, 0.15, 0.2)
+2. Calls `actualizarObjetos()` to update game logic
+3. Calls `gestionarInputs()` to handle user input
+4. Renders current state via `representacionEstado()`
+5. Processes state changes if `gameStateChanged` is true
+
+**State transition handling:**
+- **GAME_OVER → MENU:** Clears obstacles, stops game music, plays menu music, resets score/counters/timers
+- **MENU → PLAYING:** Pauses menu music, plays game music, activates player, resets game time and spawn timer, clears obstacles
+
+### dispose()
+
+```java
+@Override
+public void dispose()
+```
+
+Releases all game resources when the application closes. This method must be called when finalizing the application to avoid memory leaks.
+
+**Disposed resources:**
+- Sprite batch
+- All textures (background, player, obstacles, bullets, white pixel)
+- Fonts
+- Player object
+- Background music (menu and game)
+- Sound effects
+
+### gestionarInputs()
+
+```java
+private void gestionarInputs()
+```
+
+Manages user input according to the current game state. Handles touch, keyboard, and mouse controls for menu, gameplay, and game over screens.
+
+**MENU state inputs:**
+- Touch screen → Start game
+- SPACE or ENTER → Start game
+
+**PLAYING state inputs:**
+- Touch screen → Move player towards touch position (with 5-pixel dead zone)
+- Arrow keys → Move player (LEFT, RIGHT, UP, DOWN)
+- SPACE → Shoot bullet and trigger flash effect
+- Right mouse button → Shoot bullet and trigger flash effect
+- ENTER → Calculate final score and show score screen
+- ESCAPE → End game (transition to GAME_OVER)
+
+**GAME_OVER state inputs:**
+- ENTER → Return to menu, stop game music, show score screen
+
+### actualizarObjetos()
+
+```java
+private void actualizarObjetos()
+```
+
+Updates game logic: time, player, obstacles, collisions, and effects. Only updates obstacle generation when the game is in PLAYING state.
+
+**Update sequence:**
+1. Gets delta time for frame-independent updates
+2. If PLAYING state:
+   - Increments game time
+   - Increments spawn timer
+   - Spawns new obstacle every 0.5 seconds
+3. Updates player
+4. Updates all obstacles and removes off-screen ones
+5. Detects bullet-asteroid collisions
+6. Updates flash effect timer
+
+### detectarColisionesBalasAsteroides()
+
+```java
+private void detectarColisionesBalasAsteroides()
+```
+
+Detects collisions between player bullets and asteroids (pigs). When a bullet hits an asteroid, both objects are destroyed, explosion sound plays, and the asteroids destroyed counter increases.
+
+**Collision handling:**
+- Iterates through all bullets (reverse order)
+- For each bullet, checks collision with all obstacles
+- On collision:
+  - Calls `obstacle.destroy()`
+  - Plays explosion sound at 70% volume
+  - Increments `asteroidsDestroyed` counter
+  - Deactivates and removes bullet
+  - Breaks inner loop to prevent multiple hits
+
+### calcularPuntuacionFinal()
+
+```java
+private void calcularPuntuacionFinal()
+```
+
+Calculates the final game score. The score consists of: 1 point per second played + 10 points per asteroid (pig) destroyed.
+
+**Score formula:**
+```
+score = (int)gameTime + (asteroidsDestroyed × 10)
+```
+
+### addObstacle()
+
+```java
+private void addObstacle()
+```
+
+Generates a new obstacle (pig) at a random position at the top of the screen. Obstacles are generated with predefined size and speed.
+
+**Obstacle properties:**
+- Width: 62 pixels
+- Height: 48 pixels
+- X position: Random between 0 and screen width minus obstacle width
+- Y position: Top of screen (screen height)
+- Speed: 3f pixels per frame
+
+### representacionEstado()
+
+```java
+private void representacionEstado()
+```
+
+Renders the current game state: menu, gameplay, or game over screen. Includes all graphical elements: background, player, obstacles, informational text, and effects.
+
+**MENU state rendering:**
+- Draws game logo at full screen
+- Displays instructions: "Pulsa ESPACIO o ENTER para comenzar"
+- Shows controls: "FLECHAS para mover, ESPACIO para disparar"
+- Shows score viewing option: "ENTER para ver puntuación durante el juego"
+- Plays menu music
+
+**PLAYING state rendering:**
+- Draws night background
+- Renders flash effect if active (white overlay at 60% opacity)
+- Displays UI text:
+  - White: "Pulsa ESC para terminar", "ENTER para ver puntuación"
+  - Yellow: Time, asteroids destroyed count, current score (top-right)
+  - Red: "Jugando..." centered
+- Renders player and all bullets
+- Renders all obstacles
+- Checks player-obstacle collisions → triggers GAME_OVER
+- Renders score screen if `showScoreScreen` is true
+
+**GAME_OVER state rendering:**
+- Clears screen with red color
+- Displays in yellow:
+  - "GAME OVER" title
+  - "Puntuación final: {score}"
+  - "Pulsa ENTER para volver al menú"
+
+## Usage Example
+
+```java
+public class DesktopLauncher {
+    public static void main(String[] args) {
+        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+        config.setTitle("Space Birds");
+        config.setWindowedMode(800, 600);
+        config.setForegroundFPS(60);
+        
+        new Lwjgl3Application(new SpaceEscape(), config);
+    }
+}
+```
+
+## State Flow Diagram
+
+```
+MENU → (Touch/Space/Enter) → PLAYING
+                                  ↓
+                        (ESC/Collision)
+                                  ↓
+                              GAME_OVER
+                                  ↓
+                              (Enter)
+                                  ↓
+                                MENU
+```
+
+## Related Classes
+
+- [GameState](/api/game-state) - Enum defining the three game states
+- `Player` - Player character class with movement and shooting
+- `Obstacle` - Obstacle (pig) class with movement and collision
+- `Bullet` - Bullet projectile class
+- `ScoreScreen` - Score display screen

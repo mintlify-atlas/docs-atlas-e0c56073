@@ -1,0 +1,502 @@
+---
+title: Game Assets
+description: Overview of all game assets including images, music, and sounds
+---
+
+Space Birds uses a variety of assets to create its Angry Birds-themed gameplay experience. All assets are stored in the `assets/` directory in the project root.
+
+## Asset Directory Structure
+
+```
+assets/
+├── images/           # Textures and sprites
+│   ├── red.png       # Player character (Angry Bird)
+│   ├── cerdo.png     # Obstacle enemy (Pig)
+│   ├── bala.jpg      # Bullet projectile
+│   ├── noche.jpg     # Game background
+│   └── space.jpg     # Menu background
+├── music/            # Background music tracks
+│   ├── angry-birds.mp3  # Menu theme
+│   └── battle.mp3       # Gameplay theme
+└── sounds/           # Sound effects
+    ├── piuw.mp3           # Shoot sound
+    ├── muerteCerdo.mp3    # Explosion sound
+    └── tension-drones.mp3 # Engine/ambient sound
+```
+
+## Images
+
+### Player Character
+
+<ParamField path="red.png" type="Texture">
+  **Used for:** Player-controlled bird
+  
+  **Loaded at:** `SpaceEscape.java:148`
+  
+  **Display size:** 64x64 pixels
+  
+  **Description:** The main Angry Birds character (red bird) that the player controls. This serves as the "spaceship" in the space shooter theme.
+  
+  **Hitbox:** 75% of visual size (48x48 pixels) for fair collision detection (`Player.java:52-56`)
+</ParamField>
+
+### Obstacles
+
+<ParamField path="cerdo.png" type="Texture">
+  **Used for:** Enemy obstacles
+  
+  **Loaded at:** `SpaceEscape.java:152`
+  
+  **Display size:** 62x48 pixels
+  
+  **Description:** Pig characters from Angry Birds that serve as enemies falling from the top of the screen.
+  
+  **Hitbox:** 75% of visual size (46.5x36 pixels) for fair collision detection (`Obstacle.java:46-50`)
+  
+  **Spawn rate:** Every 0.5 seconds during gameplay (`SpaceEscape.java:297`)
+</ParamField>
+
+### Projectiles
+
+<ParamField path="bala.jpg" type="Texture">
+  **Used for:** Player bullets
+  
+  **Loaded at:** `SpaceEscape.java:154` and `Player.java:60`
+  
+  **Display size:** 10x20 pixels
+  
+  **Description:** Red projectiles fired by the player to destroy pig obstacles.
+  
+  **Speed:** 10 pixels per frame upward (`Player.java:110`)
+  
+  **Cooldown:** 0.3 seconds between shots (`Player.java:62`)
+</ParamField>
+
+### Backgrounds
+
+<Card title="noche.jpg" icon="image">
+  **Context:** Game background (PLAYING state)
+  
+  **Loaded at:** `SpaceEscape.java:140`
+  
+  **Usage:** Rendered at full screen size behind all game objects (`SpaceEscape.java:392`)
+  
+  **Theme:** Night sky/space theme for the shooter gameplay
+</Card>
+
+<Card title="space.jpg" icon="image">
+  **Context:** Menu background (MENU state)
+  
+  **Loaded at:** `SpaceEscape.java:142`
+  
+  **Usage:** Rendered at full screen size on the main menu (`SpaceEscape.java:384`)
+  
+  **Theme:** Space-themed logo or title screen
+</Card>
+
+## Music
+
+Background music loops continuously based on game state.
+
+### Menu Music
+
+<ParamField path="angry-birds.mp3" type="Music">
+  **Context:** Main menu background music
+  
+  **Loaded at:** `SpaceEscape.java:155-157`
+  
+  **Configuration:**
+  ```java
+  backgroundMenuMusic = Gdx.audio.newMusic(Gdx.files.internal("music/angry-birds.mp3"));
+  backgroundMenuMusic.setLooping(true);
+  backgroundMenuMusic.setVolume(0.5f);
+  ```
+  
+  **Playback:**
+  - Starts when entering MENU state
+  - Pauses when starting gameplay
+  - Resumes when returning to menu from GAME_OVER
+  
+  **Volume:** 50% (0.5f)
+</ParamField>
+
+### Gameplay Music
+
+<ParamField path="battle.mp3" type="Music">
+  **Context:** Active gameplay background music
+  
+  **Loaded at:** `SpaceEscape.java:158-160`
+  
+  **Configuration:**
+  ```java
+  backgroundGameMusic = Gdx.audio.newMusic(Gdx.files.internal("music/battle.mp3"));
+  backgroundGameMusic.setLooping(true);
+  backgroundGameMusic.setVolume(1.5f);
+  ```
+  
+  **Playback:**
+  - Starts when entering PLAYING state
+  - Pauses when viewing score screen
+  - Stops when entering GAME_OVER state
+  
+  **Volume:** 150% (1.5f) - Louder than menu music for intensity
+  
+  <Warning>
+  Volume above 1.0 may cause clipping or distortion on some devices. Consider normalizing the audio file instead.
+  </Warning>
+</ParamField>
+
+## Sound Effects
+
+Sound effects are played as one-off sounds (not looped).
+
+### Shoot Sound
+
+<ParamField path="piuw.mp3" type="Sound">
+  **Trigger:** Player fires a bullet
+  
+  **Loaded at:** `Player.java:59`
+  
+  **Played at:** `Player.java:116`
+  
+  **Volume:** 50% (0.5f)
+  
+  **Description:** Classic shooting sound effect played when the player presses SPACE or right-clicks to shoot.
+  
+  ```java
+  shootSound.play(0.5f);
+  ```
+</ParamField>
+
+### Explosion Sound
+
+<ParamField path="muerteCerdo.mp3" type="Sound">
+  **Trigger:** Bullet hits pig obstacle
+  
+  **Loaded at:** `SpaceEscape.java:161`
+  
+  **Played at:** `SpaceEscape.java:340`
+  
+  **Volume:** 70% (0.7f)
+  
+  **Description:** Pig death sound from Angry Birds, played when a bullet successfully destroys an obstacle.
+  
+  ```java
+  explosionSound.play(0.7f);
+  ```
+</ParamField>
+
+### Engine Sound
+
+<ParamField path="tension-drones.mp3" type="Sound">
+  **Trigger:** Game starts (entering PLAYING state)
+  
+  **Loaded at:** `Player.java:58`
+  
+  **Played at:** `Player.java:228` (via `player.activate()`)
+  
+  **Volume:** 100% (1.0f)
+  
+  **Description:** Ambient tension/drone sound that plays once when gameplay begins, simulating a spaceship engine or background tension.
+  
+  ```java
+  engineSound.play(1f);
+  ```
+  
+  <Info>
+  This is played as a one-shot sound, not looped. For continuous engine sound, consider using Music with looping enabled instead.
+  </Info>
+</ParamField>
+
+## Asset Loading
+
+### Loading Strategy
+
+All assets are loaded synchronously in the `create()` method before the game starts:
+
+```java
+@Override
+public void create() {
+    // Initialize rendering
+    batch = new SpriteBatch();
+    
+    // Load textures
+    image = new Texture("images/noche.jpg");
+    gameLogo = new Texture("images/space.jpg");
+    Texture playerTexture = new Texture("images/red.png");
+    obstacleTexture = new Texture("images/cerdo.png");
+    bulletTexture = new Texture("images/bala.jpg");
+    
+    // Load music
+    backgroundMenuMusic = Gdx.audio.newMusic(Gdx.files.internal("music/angry-birds.mp3"));
+    backgroundGameMusic = Gdx.audio.newMusic(Gdx.files.internal("music/battle.mp3"));
+    
+    // Load sounds
+    explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/muerteCerdo.mp3"));
+    
+    // Player loads its own assets
+    player = new Player(playerTexture, x, y, width, height, speed);
+}
+```
+
+<Warning>
+Synchronous loading blocks the main thread. For larger games, use libGDX's AssetManager for asynchronous loading with a loading screen.
+</Warning>
+
+### Asset Paths
+
+Assets are accessed using internal file paths relative to the `assets/` directory:
+
+```java
+// Correct
+Texture texture = new Texture("images/red.png");
+
+// Wrong - don't include 'assets/'
+Texture texture = new Texture("assets/images/red.png"); // Error!
+```
+
+libGDX automatically handles the `assets/` root directory.
+
+## Asset Disposal
+
+All assets **must be disposed** to prevent memory leaks:
+
+<CodeGroup>
+
+```java SpaceEscape Disposal
+@Override
+public void dispose() {
+    batch.dispose();
+    image.dispose();
+    font.dispose();
+    player.dispose();
+    obstacleTexture.dispose();
+    backgroundMenuMusic.dispose();
+    backgroundGameMusic.dispose();
+    whitePixel.dispose();
+    explosionSound.dispose();
+    bulletTexture.dispose();
+}
+```
+
+```java Player Disposal
+public void dispose() {
+    texture.dispose();
+    engineSound.dispose();
+    shootSound.dispose();
+    bulletTexture.dispose();
+    
+    for (Bullet bullet : bullets) {
+        bullet.dispose();
+    }
+    bullets.clear();
+}
+```
+
+</CodeGroup>
+
+<Tip>
+Dispose assets in reverse order of creation when possible. Always dispose in the `dispose()` method, not in the destructor.
+</Tip>
+
+## Asset Generation
+
+The build system automatically generates an `assets.txt` manifest file listing all assets:
+
+```gradle
+tasks.register('generateAssetList') {
+    inputs.dir("${project.rootDir}/assets/")
+    File assetsFolder = new File("${project.rootDir}/assets/")
+    File assetsFile = new File(assetsFolder, "assets.txt")
+    assetsFile.delete()
+    
+    fileTree(assetsFolder).collect { 
+        assetsFolder.relativePath(it) 
+    }.sort().each {
+        assetsFile.append(it + "\n")
+    }
+}
+```
+
+This creates `assets/assets.txt` with contents like:
+```
+images/bala.jpg
+images/cerdo.png
+images/noche.jpg
+images/red.png
+images/space.jpg
+music/angry-birds.mp3
+music/battle.mp3
+sounds/muerteCerdo.mp3
+sounds/piuw.mp3
+sounds/tension-drones.mp3
+```
+
+## Asset Optimization
+
+<AccordionGroup>
+
+<Accordion title="Texture Optimization">
+
+**Current format:** PNG for sprites, JPEG for backgrounds
+
+**Recommendations:**
+- Use PNG for sprites with transparency
+- Use JPEG for backgrounds (smaller size)
+- Keep power-of-two dimensions when possible (32, 64, 128, 256, etc.)
+- Use texture atlases for multiple small sprites
+- Enable mipmapping for scaled textures
+
+**Current sizes:**
+- Player: 64x64 (optimal)
+- Obstacle: 62x48 (slightly odd, consider 64x48)
+- Bullet: 10x20 (very small, efficient)
+
+</Accordion>
+
+<Accordion title="Audio Optimization">
+
+**Current format:** MP3
+
+**Recommendations:**
+- Use OGG Vorbis for music (better compression, royalty-free)
+- Use WAV for short sound effects (no decoding overhead)
+- Reduce music bitrate (96-128 kbps is sufficient for games)
+- Use mono audio for sound effects (stereo not needed)
+- Keep sound effects under 1 second when possible
+
+**Volume levels:**
+- Normalize audio files to consistent levels
+- Avoid setting volume > 1.0 in code (causes clipping)
+
+</Accordion>
+
+<Accordion title="Loading Performance">
+
+**For larger games:**
+
+```java
+// Use AssetManager for async loading
+AssetManager assetManager = new AssetManager();
+
+// Queue assets
+assetManager.load("images/red.png", Texture.class);
+assetManager.load("music/battle.mp3", Music.class);
+
+// Update loading (in render loop)
+if (!assetManager.update()) {
+    float progress = assetManager.getProgress();
+    // Show loading bar
+}
+
+// Access loaded assets
+Texture player = assetManager.get("images/red.png", Texture.class);
+```
+
+</Accordion>
+
+</AccordionGroup>
+
+## Adding New Assets
+
+<Steps>
+  <Step title="Add file to assets directory">
+    Place your file in the appropriate subdirectory:
+    - `assets/images/` for textures
+    - `assets/music/` for background music
+    - `assets/sounds/` for sound effects
+  </Step>
+  
+  <Step title="Load the asset in code">
+    ```java
+    // In create() method
+    Texture newTexture = new Texture("images/newsprite.png");
+    Sound newSound = Gdx.audio.newSound(Gdx.files.internal("sounds/newsound.wav"));
+    ```
+  </Step>
+  
+  <Step title="Use the asset">
+    ```java
+    // In render() method
+    batch.draw(newTexture, x, y, width, height);
+    
+    // When triggered
+    newSound.play(volume);
+    ```
+  </Step>
+  
+  <Step title="Dispose the asset">
+    ```java
+    // In dispose() method
+    newTexture.dispose();
+    newSound.dispose();
+    ```
+  </Step>
+  
+  <Step title="Rebuild to update assets.txt">
+    ```bash
+    ./gradlew generateAssetList
+    ```
+  </Step>
+</Steps>
+
+## Common Asset Issues
+
+<AccordionGroup>
+
+<Accordion title="Asset not found error">
+
+**Error:** `GdxRuntimeException: Couldn't load file: images/sprite.png`
+
+**Causes:**
+1. File doesn't exist in `assets/` directory
+2. Incorrect path (don't include `assets/` prefix)
+3. Case-sensitive file system (Linux/Android)
+4. File not included in JAR/APK build
+
+**Solution:**
+```bash
+# Verify file exists
+ls assets/images/sprite.png
+
+# Regenerate asset list
+./gradlew generateAssetList
+
+# Clean and rebuild
+./gradlew clean build
+```
+
+</Accordion>
+
+<Accordion title="Music won't play">
+
+**Common issues:**
+1. Music file too large (>10MB may cause issues)
+2. Unsupported format (use OGG or MP3)
+3. Forgot to call `music.play()`
+4. Volume set to 0
+5. Music disposed too early
+
+**Debug:**
+```java
+System.out.println("Music playing: " + music.isPlaying());
+System.out.println("Music volume: " + music.getVolume());
+```
+
+</Accordion>
+
+<Accordion title="Memory leaks">
+
+**Symptom:** Game crashes after playing for a while, especially on Android
+
+**Cause:** Assets not disposed properly
+
+**Solution:**
+1. Always dispose textures, sounds, and music in `dispose()`
+2. Don't create new textures every frame
+3. Remove bullets/obstacles from arrays when destroyed
+4. Use object pooling for frequently created/destroyed objects
+
+</Accordion>
+
+</AccordionGroup>

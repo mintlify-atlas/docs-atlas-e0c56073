@@ -1,0 +1,396 @@
+---
+title: Platform Support
+description: Platform-specific information for desktop and Android
+---
+
+Space Birds supports two platforms: **Desktop (LWJGL3)** and **Android**. The game shares the same core logic across platforms with platform-specific launchers.
+
+## Platform Overview
+
+| Platform | Backend | Minimum Requirements |
+|----------|---------|----------------------|
+| **Desktop** | LWJGL3 | Java 8+, OpenGL 2.0 |
+| **Android** | Android Backend | Android 5.0 (API 21+) |
+
+## Desktop Platform (LWJGL3)
+
+### Lwjgl3Launcher
+
+**Main class:** `com.pmm.games.lwjgl3.Lwjgl3Launcher` (`Lwjgl3Launcher.java:8`)
+
+The desktop launcher initializes the game with LWJGL3 (Lightweight Java Game Library 3) as the rendering backend.
+
+<CodeGroup>
+
+```java Main Method
+public static void main(String[] args) {
+    if (StartupHelper.startNewJvmIfRequired()) return;
+    createApplication();
+}
+```
+
+```java Configuration
+private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
+    Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
+    configuration.setTitle("SpaceEscape_AULA");
+    configuration.useVsync(true);
+    configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
+    configuration.setWindowedMode(640, 480);
+    configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
+    configuration.setOpenGLEmulation(GLEmulation.ANGLE_GLES20, 0, 0);
+    return configuration;
+}
+```
+
+</CodeGroup>
+
+### Desktop Configuration
+
+<ParamField path="Title" type="string" default="SpaceEscape_AULA">
+  Window title displayed in the title bar.
+</ParamField>
+
+<ParamField path="Window Size" type="int[]" default="[640, 480]">
+  Initial window dimensions in pixels. User can resize (if enabled).
+</ParamField>
+
+<ParamField path="VSync" type="boolean" default="true">
+  Synchronizes frame rate with monitor refresh rate to prevent screen tearing.
+</ParamField>
+
+<ParamField path="FPS Limit" type="int" default="refresh_rate + 1">
+  Limits foreground FPS to monitor refresh rate plus one. VSync provides the actual limit.
+</ParamField>
+
+<ParamField path="OpenGL Emulation" type="GLEmulation" default="ANGLE_GLES20">
+  Uses ANGLE to emulate OpenGL ES 2.0 for better compatibility on Windows and macOS (especially Apple Silicon).
+</ParamField>
+
+<ParamField path="Window Icons" type="string[]">
+  Multiple icon sizes for different contexts: 128px, 64px, 32px, 16px.
+</ParamField>
+
+### Desktop Features
+
+<CardGroup cols={2}>
+
+<Card title="Performance" icon="gauge-high">
+  - Native performance via LWJGL3
+  - Hardware-accelerated OpenGL rendering
+  - Uncapped framerate possible (if VSync disabled)
+  - Low resource usage
+</Card>
+
+<Card title="Input Methods" icon="keyboard">
+  - Full keyboard support
+  - Mouse support (right-click to shoot)
+  - Gamepad support (if implemented)
+  - Precise control
+</Card>
+
+<Card title="Distribution" icon="box">
+  - Single JAR file distribution
+  - Platform-specific JARs reduce size
+  - No installation required
+  - Cross-platform compatible
+</Card>
+
+<Card title="Development" icon="code">
+  - Faster build times
+  - Easier debugging
+  - Hot reload support
+  - Direct file system access
+</Card>
+
+</CardGroup>
+
+### macOS Specifics
+
+<Warning>
+macOS requires the JVM flag `-XstartOnFirstThread` for proper LWJGL3 operation. This is automatically added in the Gradle run configuration.
+</Warning>
+
+The `StartupHelper.startNewJvmIfRequired()` automatically handles this by restarting the JVM with the correct flag if needed.
+
+### Desktop Asset Loading
+
+Assets are loaded from the `assets/` directory in the project root:
+
+```java
+sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+```
+
+At runtime, assets are accessed via:
+```java
+Texture texture = new Texture("images/player.png");
+Music music = Gdx.audio.newMusic(Gdx.files.internal("music/song.mp3"));
+```
+
+## Android Platform
+
+### AndroidLauncher
+
+**Main class:** `com.pmm.games.android.AndroidLauncher` (`AndroidLauncher.java:10`)
+
+The Android launcher initializes the game with Android-specific backend.
+
+```java
+public class AndroidLauncher extends AndroidApplication {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
+        configuration.useImmersiveMode = true;
+        initialize(new SpaceEscape(), configuration);
+    }
+}
+```
+
+### Android Configuration
+
+<ParamField path="Package Name" type="string" default="com.pmm.games">
+  Unique identifier for the app on Google Play Store.
+</ParamField>
+
+<ParamField path="Compile SDK" type="int" default="35">
+  Android API level used for compilation.
+</ParamField>
+
+<ParamField path="Target SDK" type="int" default="35">
+  Highest Android version tested and supported.
+</ParamField>
+
+<ParamField path="Minimum SDK" type="int" default="21">
+  Lowest Android version supported (Android 5.0 Lollipop).
+</ParamField>
+
+<ParamField path="Immersive Mode" type="boolean" default="true">
+  Hides status bar and navigation bar for fullscreen experience.
+</ParamField>
+
+<ParamField path="Version Code" type="int" default="1">
+  Internal version number for updates.
+</ParamField>
+
+<ParamField path="Version Name" type="string" default="1.0">
+  User-visible version string.
+</ParamField>
+
+### Android Features
+
+<CardGroup cols={2}>
+
+<Card title="Touch Input" icon="hand-pointer">
+  - Native touchscreen support
+  - Drag to move player
+  - Tap to shoot (if implemented)
+  - Multi-touch capable
+</Card>
+
+<Card title="Mobile Optimization" icon="mobile">
+  - Adaptive resolution
+  - Immersive fullscreen mode
+  - Battery-efficient rendering
+  - Pause on minimize
+</Card>
+
+<Card title="Distribution" icon="store">
+  - Google Play Store ready
+  - APK sideloading support
+  - ProGuard minification
+  - Multi-ABI support
+</Card>
+
+<Card title="Compatibility" icon="mobile-screen">
+  - Supports Android 5.0+
+  - ARM and x86 architectures
+  - 32-bit and 64-bit
+  - Tablet compatible
+</Card>
+
+</CardGroup>
+
+### Android Asset Loading
+
+Assets are packaged into the APK from the `assets/` directory:
+
+```gradle
+assets.setSrcDirs(['../assets'])
+```
+
+At runtime, accessed the same way as desktop:
+```java
+Texture texture = new Texture("images/player.png");
+```
+
+### Native Libraries
+
+The Android build includes native libraries for multiple ABIs:
+
+| ABI | Architecture | Common Devices |
+|-----|--------------|----------------|
+| `arm64-v8a` | 64-bit ARM | Modern Android phones (2015+) |
+| `armeabi-v7a` | 32-bit ARM | Older Android phones |
+| `x86` | 32-bit Intel | Android emulators, some tablets |
+| `x86_64` | 64-bit Intel | Android emulators, Chromebooks |
+
+Native libraries are automatically extracted via the `copyAndroidNatives` Gradle task.
+
+<Info>
+Including all ABIs increases APK size but ensures compatibility. Use App Bundles on Play Store to deliver only the needed ABI to each device.
+</Info>
+
+### Android Permissions
+
+The game requires no special permissions. The manifest automatically includes:
+
+- `INTERNET` permission (not used, but common for games)
+- `WAKE_LOCK` permission (keeps screen on during gameplay)
+
+## Platform Differences
+
+<Tabs>
+  <Tab title="Input Handling">
+    **Desktop:**
+    - Keyboard: Arrow keys, SPACE, ENTER, ESC
+    - Mouse: Right-click to shoot
+    - Precise control
+
+    **Android:**
+    - Touch: Drag finger to move player toward touch point
+    - Dead zone prevents jittery movement
+    - Less precise than keyboard
+    - No dedicated shoot button (shoot on cooldown removed for mobile)
+  </Tab>
+  
+  <Tab title="Performance">
+    **Desktop:**
+    - 60+ FPS typical
+    - VSync prevents screen tearing
+    - Low latency
+    - Can render higher resolutions
+
+    **Android:**
+    - 30-60 FPS depending on device
+    - Battery considerations
+    - Thermal throttling possible
+    - Resolution varies by device
+  </Tab>
+  
+  <Tab title="Asset Loading">
+    **Desktop:**
+    - Assets loaded from file system
+    - Can be hot-reloaded during development
+    - Fast loading
+
+    **Android:**
+    - Assets packaged in APK
+    - Extracted to cache on first run
+    - Slower initial load
+  </Tab>
+  
+  <Tab title="Distribution">
+    **Desktop:**
+    - JAR file (10-30MB)
+    - No approval process
+    - Instant distribution
+    - Requires Java installation (or bundle JRE)
+
+    **Android:**
+    - APK file (20-40MB)
+    - Google Play review required
+    - Automatic updates
+    - Self-contained (no external dependencies)
+  </Tab>
+</Tabs>
+
+## Cross-Platform Code
+
+The core game logic in the `core` module is 100% shared between platforms:
+
+```
+core/
+└── src/main/java/com/pmm/games/
+    ├── SpaceEscape.java       # Platform-agnostic
+    ├── GameState.java          # Platform-agnostic
+    └── objects/                # Platform-agnostic
+        ├── Player.java
+        ├── Bullet.java
+        └── Obstacle.java
+```
+
+Only the launcher classes are platform-specific:
+- `lwjgl3/src/main/java/.../Lwjgl3Launcher.java`
+- `android/src/main/java/.../AndroidLauncher.java`
+
+<Tip>
+To add a new platform (like iOS, Web, or Console), only create a new launcher module. The core game code remains unchanged.
+</Tip>
+
+## Testing on Platforms
+
+### Desktop Testing
+
+```bash
+# Run directly
+./gradlew lwjgl3:run
+
+# Test JAR
+./gradlew lwjgl3:jar
+java -jar lwjgl3/build/libs/SpaceEscape_AULA-1.0.jar
+```
+
+### Android Testing
+
+```bash
+# Install and run on connected device/emulator
+./gradlew android:installDebug
+./gradlew android:run
+
+# Or manually install APK
+adb install android/build/outputs/apk/debug/android-debug.apk
+adb shell am start -n com.pmm.games/com.pmm.games.android.AndroidLauncher
+```
+
+## Platform Considerations
+
+<AccordionGroup>
+
+<Accordion title="Screen Sizes">
+
+The game uses pixel coordinates, which works well for fixed-size desktop windows but can cause issues on different Android devices.
+
+**Desktop:** 640x480 window (configurable)
+
+**Android:** Varies wildly (480x800 to 1440x3200+)
+
+**Recommendation:** Use viewport scaling or aspect ratio calculations for production games.
+
+</Accordion>
+
+<Accordion title="Audio Management">
+
+Both platforms handle audio differently:
+
+**Desktop:** Audio continues when window loses focus (unless explicitly paused)
+
+**Android:** Audio should pause when app goes to background to save battery
+
+**Current implementation:** Music is paused when switching states, but doesn't handle Android lifecycle events.
+
+</Accordion>
+
+<Accordion title="Performance Optimization">
+
+**Desktop:** Can handle more objects, particles, and effects without issue
+
+**Android:** Consider:
+- Reducing max simultaneous obstacles
+- Using texture atlases
+- Limiting particle effects
+- Optimizing collision detection
+- Reducing audio quality
+
+</Accordion>
+
+</AccordionGroup>
